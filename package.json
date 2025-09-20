@@ -13,7 +13,12 @@
     "test:ci": "node test/run-tests.js",
     "lint": "echo 'No linting configured yet'",
     "format": "echo 'No formatting configured yet'",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm test",
+    "docker:build": "docker build -t json-response-standard .",
+    "docker:test": "docker run json-response-standard",
+    "docker:dev": "docker-compose up json-dev",
+    "docker:up": "docker-compose up json-response-standard",
+    "docker:test-all": "docker-compose up --build test-js test-python test-php"
   },
   "keywords": [
     "json",

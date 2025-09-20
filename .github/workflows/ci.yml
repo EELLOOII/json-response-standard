@@ -260,3 +260,30 @@ jobs:
       run: |
         echo "Checking for sensitive files..."
         ! find . -name "*.env*" -o -name "*.key" -o -name "*.pem" -o -name "*.p12" | grep -v node_modules | head -1
+
+  test-docker:
+    name: Docker Container Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: docker build -t json-response-standard-test .
+      
+    - name: Run tests in Docker
+      run: docker run json-response-standard-test
+      
+    - name: Test Docker Compose
+      run: |
+        docker-compose up --build --abort-on-container-exit json-response-standard
+        
+    - name: Test individual language containers
+      run: |
+        echo "Testing JavaScript container..."
+        docker-compose up --build --abort-on-container-exit test-js
+        echo "Testing Python container..."
+        docker-compose up --build --abort-on-container-exit test-python
+        echo "Testing PHP container..."
+        docker-compose up --build --abort-on-container-exit test-php

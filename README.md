@@ -45,9 +45,24 @@ This project includes a JSON schema file ([response.schema.json](response.schema
 
 ## 🔧 Installation
 
+### Option 1: Direct Installation
 1. Clone this repository
 2. Include the appropriate response function in your project
 3. Use the schema file for validation if needed
+
+### Option 2: Docker (Recommended for Contributors)
+```bash
+# Clone the repository
+git clone https://github.com/EELLOOII/json-response-standard.git
+cd json-response-standard
+
+# Run all tests with Docker
+docker-compose up json-response-standard
+
+# Or build and run manually
+docker build -t json-response-standard .
+docker run json-response-standard
+```
 
 ### 📦 Project Structure
 
@@ -68,6 +83,9 @@ json-response-standard/
 ├── response.d.ts        # TypeScript definitions
 ├── package.json        # NPM package configuration
 ├── package-lock.json   # Dependency lock file
+├── Dockerfile          # Docker container definition
+├── docker-compose.yml  # Multi-service Docker setup
+├── .dockerignore      # Docker build exclusions
 └── README.md           # This file
 ```
 
@@ -301,6 +319,59 @@ This project follows a **zero-dependency philosophy**:
 
 The `package-lock.json` exists primarily for CI/CD consistency and npm publishing, but the actual implementations have zero runtime dependencies.
 
+## 🐳 Docker Support
+
+For contributors and cross-platform testing, Docker provides a consistent environment with all languages pre-installed.
+
+### 🚀 Quick Start with Docker
+
+```bash
+# Run all tests
+docker-compose up json-response-standard
+
+# Run specific language tests
+docker-compose up test-js      # JavaScript only
+docker-compose up test-python  # Python only  
+docker-compose up test-php     # PHP only
+
+# Interactive development
+docker-compose up json-dev
+```
+
+### 🛠️ Manual Docker Commands
+
+```bash
+# Build the image
+docker build -t json-response-standard .
+
+# Run all tests
+docker run json-response-standard
+
+# Run with volume mount for development
+docker run -v $(pwd):/app json-response-standard
+
+# Interactive shell
+docker run -it json-response-standard /bin/bash
+```
+
+### 🔧 Docker Environment
+
+The Docker container includes:
+- **Ubuntu 22.04** base image
+- **Node.js 20** for JavaScript testing
+- **Python 3.11** for Python testing  
+- **PHP 8.2** for PHP testing
+- **Non-root user** for security
+- **Health checks** for monitoring
+
+### 💡 Benefits of Docker
+
+- ✅ **Consistent environment** across all platforms
+- ✅ **No local language installation** required
+- ✅ **Isolated testing** - no conflicts with your system
+- ✅ **Easy contributor onboarding** - one command setup
+- ✅ **CI/CD ready** - same environment as production
+
 ## 🤝 Contributing
 
 We welcome contributions to expand the JSON Response Standard to more languages and improve existing implementations!
@@ -389,6 +460,7 @@ fix: handle Unicode characters in PHP implementation
 
 ### 🚀 Development Setup
 
+#### Option 1: Local Development
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/EELLOOII/json-response-standard.git
@@ -405,10 +477,24 @@ fix: handle Unicode characters in PHP implementation
    node test/run-tests.js
    ```
 
-4. **Test your changes:**
+#### Option 2: Docker Development (Recommended)
+1. **Clone and start with Docker:**
    ```bash
-   node test/run-tests.js [your-language]
+   git clone https://github.com/EELLOOII/json-response-standard.git
+   cd json-response-standard
+   docker-compose up json-dev
    ```
+
+2. **Test your changes:**
+   ```bash
+   docker-compose up json-response-standard
+   ```
+
+**Benefits of Docker approach:**
+- ✅ No need to install multiple languages locally
+- ✅ Consistent environment for all contributors
+- ✅ Same environment as CI/CD pipeline
+- ✅ Isolated testing without system conflicts
 
 ### 🏷️ Code Standards
 
