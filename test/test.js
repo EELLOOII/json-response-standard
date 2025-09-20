@@ -3,9 +3,9 @@ const { jsonResponse } = require('../examples/response.js');
 function test(description, fn) {
     try {
         fn();
-        console.log(`✅ ${description}`);
+        console.log(`[PASS] ${description}`);
     } catch (error) {
-        console.log(`❌ ${description}: ${error.message}`);
+        console.log(`[FAIL] ${description}: ${error.message}`);
     }
 }
 
@@ -65,4 +65,4 @@ test('Message validation - invalid type', () => {
     if (!errorThrown) throw new Error('Should throw error for invalid message type');
 });
 
-console.log('\nTests completed!');
+console.log('\n[SUCCESS] Tests completed!');
