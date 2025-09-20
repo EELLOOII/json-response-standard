@@ -4,7 +4,11 @@
   "description": "A simple, consistent JSON response format for multiple languages",
   "main": "examples/response.js",
   "scripts": {
-    "test": "node test/test.js"
+    "test": "node test/run-tests.js",
+    "test:js": "node test/test.js",
+    "test:python": "node test/run-tests.js python",
+    "test:php": "node test/run-tests.js php",
+    "test:all": "node test/run-tests.js"
   },
   "keywords": ["json", "response", "standard", "api"],
   "author": "Marcielo R. Abalos",
