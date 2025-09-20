@@ -6,8 +6,7 @@ FROM ubuntu:22.04
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NODE_VERSION=20
-ENV PYTHON_VERSION=3.11
-ENV PHP_VERSION=8.2
+ENV PYTHON_VERSION=3.10
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -32,16 +31,11 @@ RUN apt-get update && apt-get install -y \
     && ln -sf /usr/bin/python${PYTHON_VERSION} /usr/bin/python \
     && ln -sf /usr/bin/python${PYTHON_VERSION} /usr/bin/python3
 
-# Install PHP
+# Install PHP (using default Ubuntu version for reliability)
 RUN apt-get update && apt-get install -y \
-    software-properties-common \
-    && add-apt-repository ppa:ondrej/php -y \
-    && apt-get update \
-    && apt-get install -y \
-    php${PHP_VERSION}-cli \
-    php${PHP_VERSION}-json \
-    php${PHP_VERSION}-mbstring \
-    && ln -sf /usr/bin/php${PHP_VERSION} /usr/bin/php \
+    php-cli \
+    php-json \
+    php-mbstring \
     && rm -rf /var/lib/apt/lists/*
 
 # Verify installations
