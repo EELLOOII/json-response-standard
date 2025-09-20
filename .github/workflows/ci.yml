@@ -298,13 +298,13 @@ jobs:
       
     - name: Test Docker Compose
       run: |
-        docker-compose up --build --abort-on-container-exit json-response-standard
+        docker compose up --build --abort-on-container-exit json-response-standard
         
     - name: Test individual language containers
       run: |
         echo "Testing JavaScript container..."
-        docker-compose up --build --abort-on-container-exit test-js
+        docker compose up --build --abort-on-container-exit test-js
         echo "Testing Python container..."
-        docker-compose up --build --abort-on-container-exit test-python
+        docker compose up --build --abort-on-container-exit test-python
         echo "Testing PHP container..."
-        docker-compose up --build --abort-on-container-exit test-php
+        docker compose up --build --abort-on-container-exit test-php
