@@ -1,0 +1,85 @@
+# Docker Compose for JSON Response Standard
+# Provides easy development and testing environment
+
+version: '3.8'
+
+services:
+  # Main testing service
+  json-response-standard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: json-response-standard-test
+    volumes:
+      - .:/app
+      - /app/node_modules
+    working_dir: /app
+    command: node test/run-tests.js
+    environment:
+      - NODE_ENV=development
+    networks:
+      - json-network
+
+  # Development service with interactive shell
+  json-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: json-response-standard-dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    working_dir: /app
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+    environment:
+      - NODE_ENV=development
+    networks:
+      - json-network
+
+  # JavaScript only testing
+  test-js:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: json-test-js
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: node test/test.js
+    networks:
+      - json-network
+
+  # Python only testing
+  test-python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: json-test-python
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: python test/test.py
+    networks:
+      - json-network
+
+  # PHP only testing
+  test-php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: json-test-php
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: php test/test.php
+    networks:
+      - json-network
+
+networks:
+  json-network:
+    driver: bridge
+
+volumes:
+  node_modules:

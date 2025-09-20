@@ -1,0 +1,310 @@
+name: JSON Response Standard Tests
+
+on:
+  push:
+    branches: [ main, develop, test-* ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-javascript:
+    name: JavaScript Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16, 18, 20, 22]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        
+    - name: Install dependencies (if any)
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci --ignore-scripts
+        else
+          echo "No package-lock.json found, skipping npm ci"
+        fi
+      
+    - name: Run JavaScript tests
+      run: node test/test.js
+      
+    - name: Run unified test runner (JS only)
+      run: node test/run-tests.js js
+
+  test-python:
+    name: Python Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Run Python tests
+      run: python test/test.py
+      
+    - name: Setup Node.js for unified runner
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Run unified test runner (Python only)
+      run: node test/run-tests.js python
+
+  test-php:
+    name: PHP Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP ${{ matrix.php-version }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        
+    - name: Run PHP tests
+      run: php test/test.php
+      
+    - name: Setup Node.js for unified runner
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Run unified test runner (PHP only)
+      run: node test/run-tests.js php
+
+  test-all-languages:
+    name: All Languages Integration Test
+    runs-on: ubuntu-latest
+    needs: [test-javascript, test-python, test-php]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        
+    - name: Install npm dependencies (if any)
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci --ignore-scripts
+        else
+          echo "No package-lock.json found, skipping npm ci"
+        fi
+      
+    - name: Run all tests individually
+      run: |
+        echo "Running JavaScript tests..."
+        node test/test.js
+        echo "Running Python tests..."
+        python test/test.py
+        echo "Running PHP tests..."
+        php test/test.php
+        
+    - name: Run unified test runner (All languages)
+      run: node test/run-tests.js
+      
+    - name: Verify schema file exists
+      run: test -f response.schema.json
+      
+    - name: Verify TypeScript definitions
+      run: test -f response.d.ts
+
+  test-windows:
+    name: Windows Compatibility Test
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        
+    - name: Run tests on Windows
+      run: |
+        node test/test.js
+        python test/test.py
+        php test/test.php
+        node test/run-tests.js
+
+  test-macos:
+    name: macOS Compatibility Test
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        
+    - name: Run tests on macOS
+      run: |
+        node test/test.js
+        python test/test.py
+        php test/test.php
+        node test/run-tests.js
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Check file structure
+      run: |
+        echo "Checking project structure..."
+        echo "✅ Checking examples directory..."
+        test -d examples/
+        echo "✅ Checking test directory..."
+        test -d test/
+        echo "✅ Checking package.json..."
+        test -f package.json
+        echo "✅ Checking README.md..."
+        test -f README.md
+        echo "✅ Checking LICENSE..."
+        test -f LICENSE
+        echo "✅ All required files and directories found"
+        
+    - name: Validate JSON schema
+      run: |
+        echo "Validating JSON schema..."
+        node -e "
+          try {
+            const schema = JSON.parse(require('fs').readFileSync('response.schema.json', 'utf8'));
+            console.log('✅ JSON schema is valid');
+          } catch (error) {
+            console.error('❌ JSON schema validation failed:', error.message);
+            process.exit(1);
+          }
+        "
+        
+    - name: Check TypeScript definitions
+      run: |
+        echo "Checking TypeScript definitions..."
+        test -f response.d.ts
+        
+    - name: Validate package.json
+      run: |
+        echo "Validating package.json..."
+        node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Run npm audit
+      run: npm audit --audit-level=moderate
+      continue-on-error: true
+      
+    - name: Check for sensitive files
+      run: |
+        echo "Checking for sensitive files..."
+        SENSITIVE_FILES=$(find . -name "*.env*" -o -name "*.key" -o -name "*.pem" -o -name "*.p12" | grep -v node_modules || true)
+        if [ -n "$SENSITIVE_FILES" ]; then
+          echo "⚠️  Sensitive files found:"
+          echo "$SENSITIVE_FILES"
+          exit 1
+        else
+          echo "✅ No sensitive files found"
+        fi
+
+  test-docker:
+    name: Docker Container Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: docker build -t json-response-standard-test .
+      
+    - name: Run tests in Docker
+      run: docker run json-response-standard-test
+      
+    - name: Test Docker Compose
+      run: |
+        docker compose up --build --abort-on-container-exit json-response-standard
+        
+    - name: Test individual language containers
+      run: |
+        echo "Testing JavaScript container..."
+        docker compose up --build --abort-on-container-exit test-js
+        echo "Testing Python container..."
+        docker compose up --build --abort-on-container-exit test-python
+        echo "Testing PHP container..."
+        docker compose up --build --abort-on-container-exit test-php

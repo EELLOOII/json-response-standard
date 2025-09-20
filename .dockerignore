@@ -1,0 +1,55 @@
+# Docker ignore file for JSON Response Standard
+# Excludes unnecessary files from Docker build context
+
+# Version control
+.git
+.gitignore
+
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Runtime files
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+
+# Docker files (avoid recursion)
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD (not needed in container)
+.github/
+
+# Documentation drafts
+*.draft.md
+NOTES.md
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# PHP
+vendor/
+composer.lock
