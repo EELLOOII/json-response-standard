@@ -1,0 +1,17 @@
+{
+  "name": "json-response-standard",
+  "version": "1.0.0",
+  "description": "A simple, consistent JSON response format for multiple languages",
+  "main": "examples/response.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "keywords": ["json", "response", "standard", "api"],
+  "author": "Marcielo R. Abalos",
+  "license": "MIT",
+  "files": [
+    "examples/",
+    "response.schema.json",
+    "README.md"
+  ]
+}
