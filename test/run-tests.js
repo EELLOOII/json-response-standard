@@ -2,7 +2,7 @@
 /**
  * Unified Test Runner for JSON Response Standard
  * Usage: node test/run-tests.js [language]
- * 
+ *
  * Examples:
  *   node test/run-tests.js           // Run all tests
  *   node test/run-tests.js js        // Run only JavaScript tests
@@ -61,9 +61,9 @@ class TestRunner {
     /**
      * Check if a command is available
      */
-    async checkCommand(command) {
+    async checkCommand(command, args = ["--version"]) {
         try {
-            const result = await this.runCommand(command, ['--version']);
+            const result = await this.runCommand(command, args);
             return result.success || result.code === 0;
         } catch (error) {
             return false;
@@ -75,7 +75,7 @@ class TestRunner {
      */
     async runJavaScriptTests() {
         console.log('[INFO] Running JavaScript tests...');
-        
+
         const nodeAvailable = await this.checkCommand('node');
         if (!nodeAvailable) {
             console.log('[ERROR] Node.js not found. Please install Node.js to run JavaScript tests.');
@@ -86,12 +86,12 @@ class TestRunner {
             const result = await this.runCommand('node', ['test/test.js']);
             console.log(result.stdout);
             if (result.stderr) console.log('Error:', result.stderr);
-            
+
             this.results.javascript = {
                 success: result.success,
                 output: result.stdout
             };
-            
+
             return result.success;
         } catch (error) {
             console.log('[ERROR] JavaScript tests failed:', error.message);
@@ -104,7 +104,7 @@ class TestRunner {
      */
     async runPythonTests() {
         console.log('[INFO] Running Python tests...');
-        
+
         const pythonAvailable = await this.checkCommand('python');
         if (!pythonAvailable) {
             console.log('[ERROR] Python not found. Please install Python to run Python tests.');
@@ -115,12 +115,12 @@ class TestRunner {
             const result = await this.runCommand('python', ['test/test.py']);
             console.log(result.stdout);
             if (result.stderr) console.log('Error:', result.stderr);
-            
+
             this.results.python = {
                 success: result.success,
                 output: result.stdout
             };
-            
+
             return result.success;
         } catch (error) {
             console.log('[ERROR] Python tests failed:', error.message);
@@ -133,7 +133,7 @@ class TestRunner {
      */
     async runPHPTests() {
         console.log('[INFO] Running PHP tests...');
-        
+
         const phpAvailable = await this.checkCommand('php');
         if (!phpAvailable) {
             console.log('[ERROR] PHP not found. Please install PHP to run PHP tests.');
@@ -144,15 +144,46 @@ class TestRunner {
             const result = await this.runCommand('php', ['test/test.php']);
             console.log(result.stdout);
             if (result.stderr) console.log('Error:', result.stderr);
-            
+
             this.results.php = {
                 success: result.success,
                 output: result.stdout
             };
-            
+
             return result.success;
         } catch (error) {
             console.log('[ERROR] PHP tests failed:', error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Run Go tests
+     */
+    async runGoTests() {
+        console.log('[INFO] Running Go tests...');
+
+        const goAvailable = await this.checkCommand('go', ["version"]);
+        if (!goAvailable) {
+            console.log('[ERROR] Go not found. Please install Go to run Go tests.');
+            return false;
+        }
+
+        try {
+            const dirname = __dirname.split("/").reverse().slice(1).reverse().join("/")
+            this.projectRoot = path.join(dirname + "/examples/go")
+            const result = await this.runCommand('go', ["test", "-v", './response']);
+            console.log(result.stdout);
+            if (result.stderr) console.log('Error:', result.stderr);
+
+            this.results.go = {
+                success: result.success,
+                output: result.stdout
+            };
+
+            return result.success;
+        } catch (error) {
+            console.log('[ERROR] Go tests failed:', error.message);
             return false;
         }
     }
@@ -164,22 +195,22 @@ class TestRunner {
         console.log('\n' + '='.repeat(50));
         console.log('📊 TEST SUMMARY');
         console.log('='.repeat(50));
-        
+
         let totalPassed = 0;
         let totalRun = 0;
-        
+
         Object.entries(this.results).forEach(([language, result]) => {
             const status = result.success ? '[PASS]' : '[FAIL]';
             const languageName = language.charAt(0).toUpperCase() + language.slice(1);
             console.log(`${status} ${languageName}: ${result.success ? 'PASSED' : 'FAILED'}`);
-            
+
             if (result.success) totalPassed++;
             totalRun++;
         });
-        
+
         console.log('='.repeat(50));
         console.log('[SUMMARY] Overall: ' + totalPassed + '/' + totalRun + ' language tests passed');
-        
+
         if (totalPassed === totalRun && totalRun > 0) {
             console.log('[SUCCESS] All tests passed! Your JSON Response Standard is working perfectly across all languages!');
         } else if (totalPassed === 0) {
@@ -208,34 +239,40 @@ class TestRunner {
             'node': () => this.runJavaScriptTests(),
             'py': () => this.runPythonTests(),
             'python': () => this.runPythonTests(),
-            'php': () => this.runPHPTests()
+            'php': () => this.runPHPTests(),
+            'go': () => this.runGoTests()
         };
 
         if (targetLanguage) {
             const normalizedTarget = targetLanguage.toLowerCase();
             const runner = runners[normalizedTarget];
-            
+
             if (!runner) {
                 console.log(`[ERROR] Unknown language: ${targetLanguage}`);
                 console.log('Available languages: js, python, php');
                 process.exit(1);
             }
-            
+
             const success = await runner();
             process.exit(success ? 0 : 1);
         } else {
             // Run all tests
             const jsSuccess = await this.runJavaScriptTests();
             console.log('');
-            
+
             const pythonSuccess = await this.runPythonTests();
             console.log('');
-            
+
             const phpSuccess = await this.runPHPTests();
-            
+            console.log('')
+
+
+            const goSuccess = await this.runGoTests();
+            console.log('')
+
             this.printSummary();
-            
-            const allPassed = jsSuccess && pythonSuccess && phpSuccess;
+
+            const allPassed = jsSuccess && pythonSuccess && phpSuccess && goSuccess;
             process.exit(allPassed ? 0 : 1);
         }
     }
