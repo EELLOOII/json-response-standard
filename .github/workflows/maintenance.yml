@@ -1,0 +1,175 @@
+name: Maintenance and Dependency Updates
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  dependency-check:
+    name: Check Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Check for outdated packages
+      run: npm outdated || true
+      
+    - name: Run security audit
+      run: npm audit || true
+      
+    - name: Check package-lock.json
+      run: |
+        if [ -f package-lock.json ]; then
+          echo "package-lock.json exists"
+          npm ci --ignore-scripts
+        else
+          echo "No package-lock.json found"
+        fi
+
+  test-latest-versions:
+    name: Test with Latest Language Versions
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup latest Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+        
+    - name: Setup latest Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: Setup latest PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 'latest'
+        
+    - name: Run tests with latest versions
+      run: |
+        echo "Testing with latest language versions..."
+        node --version
+        python --version
+        php --version
+        echo ""
+        node test/run-tests.js
+
+  link-checker:
+    name: Check Documentation Links
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install link checker
+      run: npm install -g markdown-link-check
+      
+    - name: Check README links
+      run: markdown-link-check README.md --config .github/markdown-link-check.json || true
+
+  code-formatting-check:
+    name: Code Formatting Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check JavaScript formatting
+      run: |
+        echo "Checking JavaScript files..."
+        find . -name "*.js" -not -path "./node_modules/*" | while read file; do
+          echo "Checking: $file"
+          node -c "$file"
+        done
+        
+    - name: Check Python formatting
+      run: |
+        echo "Checking Python files..."
+        python -m py_compile test/test.py
+        python -m py_compile examples/response.py
+        
+    - name: Check PHP syntax
+      run: |
+        echo "Checking PHP files..."
+        php -l test/test.php
+        php -l examples/response.php
+
+  performance-benchmark:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        
+    - name: Create performance test
+      run: |
+        cat > benchmark.js << 'EOF'
+        const { jsonResponse } = require('./examples/response.js');
+        
+        console.log('Running JavaScript performance benchmark...');
+        const start = Date.now();
+        for (let i = 0; i < 10000; i++) {
+          jsonResponse({ test: i, data: "benchmark" }, 200, "Performance test");
+        }
+        const end = Date.now();
+        console.log(`JavaScript: ${end - start}ms for 10,000 operations`);
+        EOF
+        
+    - name: Run JavaScript benchmark
+      run: node benchmark.js
+      
+    - name: Create Python benchmark
+      run: |
+        cat > benchmark.py << 'EOF'
+        import sys
+        import os
+        import time
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'examples'))
+        from response import json_response
+        
+        print('Running Python performance benchmark...')
+        start = time.time()
+        for i in range(10000):
+          json_response({"test": i, "data": "benchmark"}, 200, "Performance test")
+        end = time.time()
+        print(f'Python: {(end - start) * 1000:.0f}ms for 10,000 operations')
+        EOF
+        
+    - name: Run Python benchmark
+      run: python benchmark.py

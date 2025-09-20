@@ -3,19 +3,50 @@
   "version": "1.0.0",
   "description": "A simple, consistent JSON response format for multiple languages",
   "main": "examples/response.js",
+  "types": "response.d.ts",
   "scripts": {
     "test": "node test/run-tests.js",
     "test:js": "node test/test.js",
     "test:python": "node test/run-tests.js python",
     "test:php": "node test/run-tests.js php",
-    "test:all": "node test/run-tests.js"
+    "test:all": "node test/run-tests.js",
+    "test:ci": "node test/run-tests.js",
+    "lint": "echo 'No linting configured yet'",
+    "format": "echo 'No formatting configured yet'",
+    "prepublishOnly": "npm test"
   },
-  "keywords": ["json", "response", "standard", "api"],
+  "keywords": [
+    "json",
+    "response", 
+    "standard",
+    "api",
+    "rest",
+    "http",
+    "multi-language",
+    "javascript",
+    "python",
+    "php",
+    "typescript",
+    "schema"
+  ],
   "author": "Marcielo R. Abalos",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EELLOOII/json-response-standard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EELLOOII/json-response-standard/issues"
+  },
+  "homepage": "https://github.com/EELLOOII/json-response-standard#readme",
   "files": [
     "examples/",
     "response.schema.json",
-    "README.md"
-  ]
+    "response.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=12.0.0"
+  }
 }

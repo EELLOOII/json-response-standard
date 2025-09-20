@@ -382,6 +382,77 @@ fix: handle Unicode characters in PHP implementation
 - **Open an issue** for questions or clarifications
 - **Join discussions** in GitHub Issues
 
-## 📄 License
+## � CI/CD Pipeline
+
+This project includes comprehensive automated testing and deployment pipelines.
+
+### 🔄 Continuous Integration
+
+Every push and pull request triggers automated testing across:
+
+#### Multi-Language Testing
+- **JavaScript**: Node.js 16, 18, 20, 22
+- **Python**: 3.8, 3.9, 3.10, 3.11, 3.12
+- **PHP**: 7.4, 8.0, 8.1, 8.2, 8.3
+
+#### Cross-Platform Testing
+- **Ubuntu** (primary)
+- **Windows** (compatibility)
+- **macOS** (compatibility)
+
+#### Quality Checks
+- Code syntax validation
+- Security audits
+- File structure validation
+- JSON schema validation
+- TypeScript definitions check
+
+### 📦 Automated Releases
+
+When you create a new tag (e.g., `v1.1.0`):
+
+1. **Pre-release testing** - Full test suite across all platforms
+2. **Version validation** - Ensures package.json matches tag
+3. **Asset creation** - ZIP and TAR archives
+4. **NPM publishing** - Automatic npm package publication
+5. **Documentation updates** - Changelog generation
+
+### 🔧 Maintenance Automation
+
+Weekly automated tasks:
+- **Dependency updates** via Dependabot
+- **Latest version testing** - Test with newest language versions
+- **Link checking** - Validate documentation links
+- **Performance benchmarks** - Monitor response generation speed
+- **Security scans** - Regular vulnerability checks
+
+### 📊 CI/CD Status
+
+All workflows run automatically and provide status badges:
+
+```markdown
+![CI Tests](https://github.com/EELLOOII/json-response-standard/workflows/JSON%20Response%20Standard%20Tests/badge.svg)
+![Release](https://github.com/EELLOOII/json-response-standard/workflows/Release%20and%20Publish/badge.svg)
+![Maintenance](https://github.com/EELLOOII/json-response-standard/workflows/Maintenance%20and%20Dependency%20Updates/badge.svg)
+```
+
+### 🛠️ Local CI Testing
+
+You can run the same tests locally:
+
+```bash
+# Run all tests (same as CI)
+npm run test:ci
+
+# Run individual language tests
+npm run test:js
+npm run test:python  
+npm run test:php
+
+# Check for issues before committing
+npm test
+```
+
+## �📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
