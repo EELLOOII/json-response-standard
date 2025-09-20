@@ -218,16 +218,30 @@ jobs:
     - name: Check file structure
       run: |
         echo "Checking project structure..."
+        echo "✅ Checking examples directory..."
         test -d examples/
+        echo "✅ Checking test directory..."
         test -d test/
+        echo "✅ Checking package.json..."
         test -f package.json
+        echo "✅ Checking README.md..."
         test -f README.md
+        echo "✅ Checking LICENSE..."
         test -f LICENSE
+        echo "✅ All required files and directories found"
         
     - name: Validate JSON schema
       run: |
         echo "Validating JSON schema..."
-        node -e "JSON.parse(require('fs').readFileSync('response.schema.json', 'utf8'))"
+        node -e "
+          try {
+            const schema = JSON.parse(require('fs').readFileSync('response.schema.json', 'utf8'));
+            console.log('✅ JSON schema is valid');
+          } catch (error) {
+            console.error('❌ JSON schema validation failed:', error.message);
+            process.exit(1);
+          }
+        "
         
     - name: Check TypeScript definitions
       run: |
@@ -259,7 +273,14 @@ jobs:
     - name: Check for sensitive files
       run: |
         echo "Checking for sensitive files..."
-        ! find . -name "*.env*" -o -name "*.key" -o -name "*.pem" -o -name "*.p12" | grep -v node_modules | head -1
+        SENSITIVE_FILES=$(find . -name "*.env*" -o -name "*.key" -o -name "*.pem" -o -name "*.p12" | grep -v node_modules || true)
+        if [ -n "$SENSITIVE_FILES" ]; then
+          echo "⚠️  Sensitive files found:"
+          echo "$SENSITIVE_FILES"
+          exit 1
+        else
+          echo "✅ No sensitive files found"
+        fi
 
   test-docker:
     name: Docker Container Test
