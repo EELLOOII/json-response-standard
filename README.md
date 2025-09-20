@@ -258,6 +258,130 @@ Each implementation has **zero external dependencies**:
 ### 💡 Partial Testing
 You can test individual languages even if you don't have all dependencies installed. The unified test runner automatically detects available languages and skips missing ones.
 
+## 🤝 Contributing
+
+We welcome contributions to expand the JSON Response Standard to more languages and improve existing implementations!
+
+### 🌟 How to Contribute
+
+#### 1. Adding a New Language Implementation
+
+Want to implement this standard in Go, Rust, Java, C#, or another language? Here's how:
+
+1. **Fork the repository**
+2. **Follow the standard format:**
+   ```json
+   {
+     "status": 200,
+     "message": "Success message",
+     "data": {}
+   }
+   ```
+
+3. **Create your implementation** in `examples/response.[extension]`:
+   - Function should accept: `data`, `status` (default: 200), `message` (default: "")
+   - Validate status codes (100-599)
+   - Validate message is string type
+   - Return formatted JSON string
+   - Handle null/empty data gracefully
+
+4. **Add comprehensive tests** in `test/test.[extension]`:
+   - Basic response generation
+   - Default value handling
+   - Input validation
+   - Error handling
+   - Language-specific features
+
+5. **Update the test runner** (`test/run-tests.js`) to include your language
+
+#### 2. Implementation Template
+
+```javascript
+// Template structure for any language
+function jsonResponse(data = {}, status = 200, message = "") {
+    // 1. Validate status (100-599)
+    // 2. Validate message is string
+    // 3. Handle null/undefined data
+    // 4. Return JSON with required structure
+}
+```
+
+#### 3. Testing Guidelines
+
+Your implementation must pass these core tests:
+- ✅ **Structure validation** - Correct JSON format
+- ✅ **Default handling** - Proper defaults for missing parameters
+- ✅ **Input validation** - Type checking and range validation
+- ✅ **Error handling** - Appropriate exceptions/errors
+- ✅ **Edge cases** - Null data, special characters, etc.
+
+### 🎯 Contribution Areas
+
+We're looking for:
+
+- **New language implementations** (Go, Rust, Java, C#, Ruby, etc.)
+- **Enhanced validation** in existing implementations
+- **Performance improvements**
+- **Documentation improvements**
+- **Test coverage expansion**
+- **CI/CD pipeline** enhancements
+- **Schema validation** tools
+
+### 📋 Pull Request Guidelines
+
+1. **Create a feature branch** from `main`
+2. **Follow existing code style** in each language
+3. **Add comprehensive tests** for your changes
+4. **Update documentation** (README, comments)
+5. **Ensure all tests pass** before submitting
+6. **Write clear commit messages**
+
+Example commit messages:
+```
+feat: add Go implementation with validation
+test: add edge case tests for Python implementation  
+docs: update README with Rust example
+fix: handle Unicode characters in PHP implementation
+```
+
+### 🚀 Development Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/EELLOOII/json-response-standard.git
+   cd json-response-standard
+   ```
+
+2. **Install dependencies** (for testing):
+   - Node.js 12+ 
+   - Python 3.5+
+   - PHP 5.4+
+
+3. **Run tests:**
+   ```bash
+   node test/run-tests.js
+   ```
+
+4. **Test your changes:**
+   ```bash
+   node test/run-tests.js [your-language]
+   ```
+
+### 🏷️ Code Standards
+
+- **Zero external dependencies** (use standard libraries only)
+- **Consistent naming** across languages
+- **Comprehensive error handling**
+- **Clear documentation** and comments
+- **Follow language conventions** (camelCase for JS, snake_case for Python, etc.)
+
+### 🆘 Need Help?
+
+- **Check existing implementations** in `examples/` for reference
+- **Review test files** in `test/` for expected behavior
+- **Open an issue** for questions or clarifications
+- **Join discussions** in GitHub Issues
+
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
