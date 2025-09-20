@@ -33,13 +33,16 @@ RUN apt-get update && apt-get install -y \
     && ln -sf /usr/bin/python${PYTHON_VERSION} /usr/bin/python3
 
 # Install PHP
-RUN add-apt-repository ppa:ondrej/php -y \
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    && add-apt-repository ppa:ondrej/php -y \
     && apt-get update \
     && apt-get install -y \
     php${PHP_VERSION}-cli \
     php${PHP_VERSION}-json \
     php${PHP_VERSION}-mbstring \
-    && ln -sf /usr/bin/php${PHP_VERSION} /usr/bin/php
+    && ln -sf /usr/bin/php${PHP_VERSION} /usr/bin/php \
+    && rm -rf /var/lib/apt/lists/*
 
 # Verify installations
 RUN node --version && \
