@@ -2,9 +2,9 @@ name: JSON Response Standard Tests
 
 on:
   push:
-    branches: [ main, develop, test-* ]
+    branches: [ main, develop, staging, test-* ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, staging ]
   workflow_dispatch:
 
 jobs:
@@ -308,3 +308,39 @@ jobs:
         docker compose up --build --abort-on-container-exit test-python
         echo "Testing PHP container..."
         docker compose up --build --abort-on-container-exit test-php
+
+  deploy-staging:
+    name: Deploy to Staging Environment
+    runs-on: ubuntu-latest
+    needs: [test-all-languages, code-quality, security-audit, test-docker]
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Build for staging
+      run: |
+        echo "Building for staging environment..."
+        # Add your staging build commands here
+        # For example: npm run build:staging
+        
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        echo "Branch: ${{ github.ref }}"
+        echo "Commit: ${{ github.sha }}"
+        # Add your deployment commands here
+        # This could be deploying to a staging server, updating documentation, etc.
+        
+    - name: Notify deployment
+      run: |
+        echo "✅ Staging deployment completed successfully"
+        echo "Staging URL: https://staging.json-response-standard.example.com"
+        # You can add Slack/Discord notifications here if needed
