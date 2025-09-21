@@ -1,0 +1,46 @@
+# Staging Environment Configuration
+# This file defines environment-specific settings for the staging branch
+
+environment:
+  name: staging
+  url: https://staging.json-response-standard.example.com
+  
+variables:
+  # Environment-specific variables
+  NODE_ENV: staging
+  DEBUG: true
+  LOG_LEVEL: debug
+  
+  # API Configuration
+  API_BASE_URL: https://api-staging.json-response-standard.example.com
+  
+  # Feature flags for staging
+  ENABLE_EXPERIMENTAL_FEATURES: true
+  STRICT_VALIDATION: false
+
+# Protection rules for staging environment
+protection_rules:
+  # Require pull request reviews
+  required_reviewers: 1
+  
+  # Allow force pushes for staging (more flexible than production)
+  allow_force_pushes: true
+  
+  # Environment-specific deployment conditions
+  deployment_branch_policy:
+    protected_branches: false
+    custom_branch_policies: true
+    allowed_branches:
+      - staging
+      - develop
+      - "feature/*"
+
+# Notifications
+notifications:
+  slack_channel: "#staging-deployments"
+  email_on_failure: true
+  
+# Monitoring
+monitoring:
+  health_check_url: https://staging.json-response-standard.example.com/health
+  response_timeout: 30s

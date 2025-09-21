@@ -16,6 +16,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    - name: Verify staging branch integration
+      run: |
+        echo "Verifying that this release has been tested through staging..."
+        # Check if the current commit exists in staging branch
+        git fetch origin staging
+        if git merge-base --is-ancestor HEAD origin/staging; then
+          echo "✅ Current commit exists in staging branch - properly tested"
+        else
+          echo "⚠️  Warning: Current commit may not have been tested through staging"
+          echo "Consider merging through staging branch first for proper testing"
+        fi
+      
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
