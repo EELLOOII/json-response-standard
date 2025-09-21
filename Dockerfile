@@ -29,7 +29,12 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-venv \
     && ln -sf /usr/bin/python${PYTHON_VERSION} /usr/bin/python \
-    && ln -sf /usr/bin/python${PYTHON_VERSION} /usr/bin/python3
+    && ln -sf /usr/bin/python${PYTHON_VERSION} /usr/bin/python3 && \
+    wget https://go.dev/dl/go1.25.1.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.25.1.linux-amd64.tar.gz && \
+    rm go1.25.1.linux-amd64.tar.gz
+
+ENV PATH="/usr/local/go/bin:${PATH}"
 
 # Install PHP (using default Ubuntu version for reliability)
 RUN apt-get update && apt-get install -y \
@@ -42,7 +47,8 @@ RUN apt-get update && apt-get install -y \
 RUN node --version && \
     npm --version && \
     python --version && \
-    php --version
+    php --version && \
+    go version
 
 # Set working directory
 WORKDIR /app

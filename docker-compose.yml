@@ -1,8 +1,6 @@
 # Docker Compose for JSON Response Standard
 # Provides easy development and testing environment
 
-version: '3.8'
-
 services:
   # Main testing service
   json-response-standard:
@@ -74,6 +72,19 @@ services:
       - .:/app
     working_dir: /app
     command: php test/test.php
+    networks:
+      - json-network
+
+  # Go only testing
+  test-go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-test-php
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bash -c "cd examples/go/response && go test"
     networks:
       - json-network
 

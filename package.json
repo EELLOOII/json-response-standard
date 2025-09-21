@@ -9,6 +9,7 @@
     "test:js": "node test/test.js",
     "test:python": "node test/run-tests.js python",
     "test:php": "node test/run-tests.js php",
+    "test:go": "node test/run-tests.js go",
     "test:all": "node test/run-tests.js",
     "test:ci": "node test/run-tests.js",
     "lint": "echo 'No linting configured yet'",
@@ -22,7 +23,7 @@
   },
   "keywords": [
     "json",
-    "response", 
+    "response",
     "standard",
     "api",
     "rest",
