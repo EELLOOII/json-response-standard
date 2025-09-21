@@ -2,8 +2,9 @@
 /**
  * Unified Test Runner for JSON Response Standard
  * 
- * SUPPORTED LANGUAGES: JavaScript, Python, PHP
- * NOTE: This test runner does NOT support Go, Rust, Java, or other languages.
+ * SUPPORTED LANGUAGES: JavaScript, Python, PHP, Go, Rust, Java, C#, Ruby
+ * NOTE: Additional languages are automatically detected if test files exist.
+ * Languages without test files will be gracefully skipped.
  * 
  * Usage: node test/run-tests.js [language]
  * 
@@ -12,6 +13,8 @@
  *   node test/run-tests.js js        // Run only JavaScript tests
  *   node test/run-tests.js python    // Run only Python tests
  *   node test/run-tests.js php       // Run only PHP tests
+ *   node test/run-tests.js go        // Run only Go tests (if test.go exists)
+ *   node test/run-tests.js rust      // Run only Rust tests (if test.rs exists)
  */
 
 const { spawn } = require('child_process');
@@ -50,23 +53,47 @@ class TestRunner {
                 versionFlag: '--version',
                 displayName: 'PHP'
             },
-            // Future contributors can easily add new languages here:
-            // 'go': {
-            //     aliases: ['go', 'golang'],
-            //     testFile: 'test.go',
-            //     command: 'go',
-            //     args: ['run', 'test/test.go'],
-            //     versionFlag: 'version',
-            //     displayName: 'Go'
-            // },
-            // 'rust': {
-            //     aliases: ['rust', 'rs'],
-            //     testFile: 'test.rs',
-            //     command: 'cargo',
-            //     args: ['run', '--bin', 'test'],
-            //     versionFlag: '--version',
-            //     displayName: 'Rust'
-            // }
+            // Additional languages (will be auto-discovered if test files exist)
+            'go': {
+                aliases: ['go', 'golang'],
+                testFile: 'test.go',
+                command: 'go',
+                args: ['run', 'test/test.go'],
+                versionFlag: 'version',
+                displayName: 'Go'
+            },
+            'rust': {
+                aliases: ['rust', 'rs'],
+                testFile: 'test.rs',
+                command: 'cargo',
+                args: ['run', '--bin', 'test'],
+                versionFlag: '--version',
+                displayName: 'Rust'
+            },
+            'java': {
+                aliases: ['java'],
+                testFile: 'Test.java',
+                command: 'java',
+                args: ['test/Test.java'],
+                versionFlag: '--version',
+                displayName: 'Java'
+            },
+            'csharp': {
+                aliases: ['cs', 'csharp', 'c#'],
+                testFile: 'test.cs',
+                command: 'dotnet',
+                args: ['run', '--project', 'test/'],
+                versionFlag: '--version',
+                displayName: 'C#'
+            },
+            'ruby': {
+                aliases: ['rb', 'ruby'],
+                testFile: 'test.rb',
+                command: 'ruby',
+                args: ['test/test.rb'],
+                versionFlag: '--version',
+                displayName: 'Ruby'
+            }
         };
     }
 
