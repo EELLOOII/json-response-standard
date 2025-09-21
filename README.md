@@ -406,7 +406,21 @@ Want to implement this standard in Go, Rust, Java, C#, or another language? Here
    - Error handling
    - Language-specific features
 
-5. **Update the test runner** (`test/run-tests.js`) to include your language
+5. **Add language configuration** to `test/run-tests.js`:
+   ```javascript
+   'your-language': {
+       aliases: ['lang', 'language-name'],
+       testFile: 'test.[extension]',
+       command: 'your-runtime-command',
+       args: ['arguments', 'to', 'run', 'test/test.[extension]'],
+       versionFlag: '--version',  // or 'version' for some languages
+       displayName: 'Your Language'
+   }
+   ```
+
+6. **Test your implementation**: `node test/run-tests.js [your-language]`
+
+**📖 Detailed Guide**: See [CONTRIBUTING_LANGUAGES.md](CONTRIBUTING_LANGUAGES.md) for step-by-step instructions, templates, and examples for specific languages.
 
 #### 2. Implementation Template
 
