@@ -107,31 +107,31 @@ jobs:
             version_param: go-version
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
-      
-    - name: Setup ${{ matrix.runtime }} ${{ matrix.version }}
-      uses: ${{ matrix.setup_action }}
-      with:
-        ${{ matrix.version_param }}: ${{ matrix.version }}
+      - name: Checkout code
+        uses: actions/checkout@v5
         
-    - name: Setup Node.js for test runner
-      if: matrix.runtime != 'node'
-      uses: actions/setup-node@v5
-      with:
-        node-version: '20'
+      - name: Setup ${{ matrix.runtime }} ${{ matrix.version }}
+        uses: ${{ matrix.setup_action }}
+        with:
+          ${{ matrix.version_param }}: ${{ matrix.version }}
+          
+      - name: Setup Node.js for test runner
+        if: matrix.runtime != 'node'
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies (if any)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts
+          else
+            echo "No package-lock.json found, skipping npm ci"
+          fi
         
-    - name: Install dependencies (if any)
-      run: |
-        if [ -f package-lock.json ]; then
-          npm ci --ignore-scripts
-        else
-          echo "No package-lock.json found, skipping npm ci"
-        fi
-      
-    - name: Run tests for ${{ matrix.language }}
-      run: node test/run-tests.js ${{ matrix.language }}
-      continue-on-error: false
+      - name: Run tests for ${{ matrix.language }}
+        run: node test/run-tests.js ${{ matrix.language }}
+        continue-on-error: false
 
   test-all-languages:
     name: All Languages Integration Test
@@ -139,44 +139,44 @@ jobs:
     needs: [test-languages]
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: '20'
+      - name: Checkout code
+        uses: actions/checkout@v5
         
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.11'
-        
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
-        
-    - name: Install npm dependencies (if any)
-      run: |
-        if [ -f package-lock.json ]; then
-          npm ci --ignore-scripts
-        else
-          echo "No package-lock.json found, skipping npm ci"
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          
+      - name: Install npm dependencies (if any)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts
+          else
+            echo "No package-lock.json found, skipping npm ci"
         fi
       
-    - name: Run all available language tests
-      run: |
+      - name: Run all available language tests
+        run: |
         echo "🚀 Running all available language tests dynamically..."
         node test/run-tests.js
         
-    - name: Verify core project files
-      run: |
+      - name: Verify core project files
+        run: |
         echo "✅ Verifying core project files..."
         test -f response.schema.json
         test -f response.d.ts
@@ -189,32 +189,32 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
         node-version: '20'
         
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
         python-version: '3.11'
         
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
         php-version: '8.2'
         
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
         go-version: '1.22'
         
-    - name: Run all available tests on Windows
-      shell: pwsh
-      run: |
+      - name: Run all available tests on Windows
+        shell: pwsh
+        run: |
         Write-Host "🪟 Running all available language tests on Windows..."
         node test/run-tests.js
         Write-Host "✅ Windows compatibility tests completed!"
@@ -224,31 +224,31 @@ jobs:
     runs-on: macos-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
         node-version: '20'
         
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
         python-version: '3.11'
         
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
         php-version: '8.2'
         
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with:
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
         go-version: '1.22'
         
-    - name: Run all available tests on macOS
-      run: |
+      - name: Run all available tests on macOS
+        run: |
         echo "🍎 Running all available language tests on macOS..."
         node test/run-tests.js
         echo "✅ macOS compatibility tests completed!"
@@ -258,16 +258,16 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
         node-version: '20'
         
-    - name: Check file structure
-      run: |
+      - name: Check file structure
+        run: |
         echo "Checking project structure..."
         echo "✅ Checking examples directory..."
         test -d examples/
@@ -281,8 +281,8 @@ jobs:
         test -f LICENSE
         echo "✅ All required files and directories found"
         
-    - name: Validate JSON schema
-      run: |
+      - name: Validate JSON schema
+        run: |
         echo "Validating JSON schema..."
         node -e "
           try {
@@ -294,13 +294,13 @@ jobs:
           }
         "
         
-    - name: Check TypeScript definitions
-      run: |
+      - name: Check TypeScript definitions
+        run: |
         echo "Checking TypeScript definitions..."
         test -f response.d.ts
         
-    - name: Validate package.json
-      run: |
+      - name: Validate package.json
+        run: |
         echo "Validating package.json..."
         node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
 
@@ -309,20 +309,20 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
         node-version: '20'
         
-    - name: Run npm audit
-      run: npm audit --audit-level=moderate
-      continue-on-error: true
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
       
-    - name: Check for sensitive files
-      run: |
+      - name: Check for sensitive files
+        run: |
         echo "Checking for sensitive files..."
         SENSITIVE_FILES=$(find . -name "*.env*" -o -name "*.key" -o -name "*.pem" -o -name "*.p12" | grep -v node_modules || true)
         if [ -n "$SENSITIVE_FILES" ]; then
@@ -338,38 +338,38 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
       
-    - name: Setup Node.js for generators
-      uses: actions/setup-node@v5
-      with:
+      - name: Setup Node.js for generators
+        uses: actions/setup-node@v5
+        with:
         node-version: '20'
         
-    - name: Generate dynamic Docker configurations
-      run: |
+      - name: Generate dynamic Docker configurations
+        run: |
         echo "🔧 Generating dynamic Docker configurations..."
         node scripts/generate-dockerfile.js --available
         node scripts/generate-docker-compose.js --override
         echo "✅ Dynamic configurations generated!"
         
-    - name: Build Docker image with dynamic Dockerfile
-      run: |
+      - name: Build Docker image with dynamic Dockerfile
+        run: |
         if [ -f Dockerfile.generated ]; then
           docker build -f Dockerfile.generated -t json-response-standard-test .
         else
           docker build -t json-response-standard-test .
         fi
       
-    - name: Run all tests in Docker
-      run: docker run json-response-standard-test
+      - name: Run all tests in Docker
+        run: docker run json-response-standard-test
       
-    - name: Test Docker Compose main service
-      run: |
+      - name: Test Docker Compose main service
+        run: |
         docker compose up --build --abort-on-container-exit json-response-standard
         
-    - name: Test discovered language containers dynamically
-      run: |
+      - name: Test discovered language containers dynamically
+        run: |
         echo "🐳 Testing discovered language containers..."
         
         # Get list of available services
@@ -412,30 +412,31 @@ jobs:
     environment: staging
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
         node-version: '20'
         
-    - name: Build for staging
-      run: |
+      - name: Build for staging
+        run: |
         echo "Building for staging environment..."
         # Add your staging build commands here
         # For example: npm run build:staging
         
-    - name: Deploy to staging
-      run: |
+      - name: Deploy to staging
+        run: |
         echo "Deploying to staging environment..."
         echo "Branch: ${{ github.ref }}"
         echo "Commit: ${{ github.sha }}"
         # Add your deployment commands here
         # This could be deploying to a staging server, updating documentation, etc.
         
-    - name: Notify deployment
-      run: |
+      - name: Notify deployment
+        run: |
         echo "✅ Staging deployment completed successfully"
         echo "Staging URL: https://staging.json-response-standard.example.com"
         # You can add Slack/Discord notifications here if needed
+
