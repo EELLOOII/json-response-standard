@@ -18,102 +18,85 @@ jobs:
           - language: javascript
             runtime: node
             version: "16"
-            setup_action: actions/setup-node@v5
-            version_param: node-version
           - language: javascript
             runtime: node
             version: "18"
-            setup_action: actions/setup-node@v5
-            version_param: node-version
           - language: javascript
             runtime: node
             version: "20"
-            setup_action: actions/setup-node@v5
-            version_param: node-version
           - language: javascript
             runtime: node
             version: "22"
-            setup_action: actions/setup-node@v5
-            version_param: node-version
           - language: python
             runtime: python
             version: "3.8"
-            setup_action: actions/setup-python@v6
-            version_param: python-version
           - language: python
             runtime: python
             version: "3.9"
-            setup_action: actions/setup-python@v6
-            version_param: python-version
           - language: python
             runtime: python
             version: "3.10"
-            setup_action: actions/setup-python@v6
-            version_param: python-version
           - language: python
             runtime: python
             version: "3.11"
-            setup_action: actions/setup-python@v6
-            version_param: python-version
           - language: python
             runtime: python
             version: "3.12"
-            setup_action: actions/setup-python@v6
-            version_param: python-version
           - language: php
             runtime: php
             version: "7.4"
-            setup_action: shivammathur/setup-php@v2
-            version_param: php-version
           - language: php
             runtime: php
             version: "8.0"
-            setup_action: shivammathur/setup-php@v2
-            version_param: php-version
           - language: php
             runtime: php
             version: "8.1"
-            setup_action: shivammathur/setup-php@v2
-            version_param: php-version
           - language: php
             runtime: php
             version: "8.2"
-            setup_action: shivammathur/setup-php@v2
-            version_param: php-version
           - language: php
             runtime: php
             version: "8.3"
-            setup_action: shivammathur/setup-php@v2
-            version_param: php-version
           - language: go
             runtime: go
             version: "1.19"
-            setup_action: actions/setup-go@v5
-            version_param: go-version
           - language: go
             runtime: go
             version: "1.20"
-            setup_action: actions/setup-go@v5
-            version_param: go-version
           - language: go
             runtime: go
             version: "1.21"
-            setup_action: actions/setup-go@v5
-            version_param: go-version
           - language: go
             runtime: go
             version: "1.22"
-            setup_action: actions/setup-go@v5
-            version_param: go-version
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
         
-      - name: Setup ${{ matrix.runtime }} ${{ matrix.version }}
-        uses: ${{ matrix.setup_action }}
+      - name: Setup Node.js ${{ matrix.version }}
+        if: ${{ matrix.runtime == 'node' }}
+        uses: actions/setup-node@v5
         with:
-          ${{ matrix.version_param }}: ${{ matrix.version }}
+          node-version: ${{ matrix.version }}
+          
+      - name: Setup Python ${{ matrix.version }}
+        if: ${{ matrix.runtime == 'python' }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.version }}
+          
+      - name: Setup PHP ${{ matrix.version }}
+        if: ${{ matrix.runtime == 'php' }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.version }}
+          
+      - name: Setup Go ${{ matrix.version }}
+        if: ${{ matrix.runtime == 'go' }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.version }}
           
       - name: Setup Node.js for test runner
         if: ${{ matrix.runtime != 'node' }}
