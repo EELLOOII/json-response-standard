@@ -116,7 +116,7 @@ jobs:
           ${{ matrix.version_param }}: ${{ matrix.version }}
           
       - name: Setup Node.js for test runner
-        if: matrix.runtime != 'node'
+        if: ${{ matrix.runtime != 'node' }}
         uses: actions/setup-node@v5
         with:
           node-version: '20'
