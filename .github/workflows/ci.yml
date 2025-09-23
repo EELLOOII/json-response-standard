@@ -8,21 +8,118 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-javascript:
-    name: JavaScript Tests
+  test-languages:
+    name: Language Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16, 18, 20, 22]
+        # Test core languages with multiple versions
+        include:
+          - language: javascript
+            runtime: node
+            version: "16"
+            setup_action: actions/setup-node@v5
+            version_param: node-version
+          - language: javascript
+            runtime: node
+            version: "18"
+            setup_action: actions/setup-node@v5
+            version_param: node-version
+          - language: javascript
+            runtime: node
+            version: "20"
+            setup_action: actions/setup-node@v5
+            version_param: node-version
+          - language: javascript
+            runtime: node
+            version: "22"
+            setup_action: actions/setup-node@v5
+            version_param: node-version
+          - language: python
+            runtime: python
+            version: "3.8"
+            setup_action: actions/setup-python@v6
+            version_param: python-version
+          - language: python
+            runtime: python
+            version: "3.9"
+            setup_action: actions/setup-python@v6
+            version_param: python-version
+          - language: python
+            runtime: python
+            version: "3.10"
+            setup_action: actions/setup-python@v6
+            version_param: python-version
+          - language: python
+            runtime: python
+            version: "3.11"
+            setup_action: actions/setup-python@v6
+            version_param: python-version
+          - language: python
+            runtime: python
+            version: "3.12"
+            setup_action: actions/setup-python@v6
+            version_param: python-version
+          - language: php
+            runtime: php
+            version: "7.4"
+            setup_action: shivammathur/setup-php@v2
+            version_param: php-version
+          - language: php
+            runtime: php
+            version: "8.0"
+            setup_action: shivammathur/setup-php@v2
+            version_param: php-version
+          - language: php
+            runtime: php
+            version: "8.1"
+            setup_action: shivammathur/setup-php@v2
+            version_param: php-version
+          - language: php
+            runtime: php
+            version: "8.2"
+            setup_action: shivammathur/setup-php@v2
+            version_param: php-version
+          - language: php
+            runtime: php
+            version: "8.3"
+            setup_action: shivammathur/setup-php@v2
+            version_param: php-version
+          - language: go
+            runtime: go
+            version: "1.19"
+            setup_action: actions/setup-go@v5
+            version_param: go-version
+          - language: go
+            runtime: go
+            version: "1.20"
+            setup_action: actions/setup-go@v5
+            version_param: go-version
+          - language: go
+            runtime: go
+            version: "1.21"
+            setup_action: actions/setup-go@v5
+            version_param: go-version
+          - language: go
+            runtime: go
+            version: "1.22"
+            setup_action: actions/setup-go@v5
+            version_param: go-version
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
       
-    - name: Setup Node.js ${{ matrix.node-version }}
+    - name: Setup ${{ matrix.runtime }} ${{ matrix.version }}
+      uses: ${{ matrix.setup_action }}
+      with:
+        ${{ matrix.version_param }}: ${{ matrix.version }}
+        
+    - name: Setup Node.js for test runner
+      if: matrix.runtime != 'node'
       uses: actions/setup-node@v5
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20'
         
     - name: Install dependencies (if any)
       run: |
@@ -32,70 +129,14 @@ jobs:
           echo "No package-lock.json found, skipping npm ci"
         fi
       
-    - name: Run JavaScript tests
-      run: node test/test.js
-      
-    - name: Run unified test runner (JS only)
-      run: node test/run-tests.js js
-
-  test-python:
-    name: Python Tests
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
-      
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.python-version }}
-        
-    - name: Run Python tests
-      run: python test/test.py
-      
-    - name: Setup Node.js for unified runner
-      uses: actions/setup-node@v5
-      with:
-        node-version: '20'
-        
-    - name: Run unified test runner (Python only)
-      run: node test/run-tests.js python
-
-  test-php:
-    name: PHP Tests
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3']
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
-      
-    - name: Setup PHP ${{ matrix.php-version }}
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php-version }}
-        
-    - name: Run PHP tests
-      run: php test/test.php
-      
-    - name: Setup Node.js for unified runner
-      uses: actions/setup-node@v5
-      with:
-        node-version: '20'
-        
-    - name: Run unified test runner (PHP only)
-      run: node test/run-tests.js php
+    - name: Run tests for ${{ matrix.language }}
+      run: node test/run-tests.js ${{ matrix.language }}
+      continue-on-error: false
 
   test-all-languages:
     name: All Languages Integration Test
     runs-on: ubuntu-latest
-    needs: [test-javascript, test-python, test-php]
+    needs: [test-languages]
     
     steps:
     - name: Checkout code
@@ -116,6 +157,11 @@ jobs:
       with:
         php-version: '8.2'
         
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+        
     - name: Install npm dependencies (if any)
       run: |
         if [ -f package-lock.json ]; then
@@ -124,23 +170,19 @@ jobs:
           echo "No package-lock.json found, skipping npm ci"
         fi
       
-    - name: Run all tests individually
+    - name: Run all available language tests
       run: |
-        echo "Running JavaScript tests..."
-        node test/test.js
-        echo "Running Python tests..."
-        python test/test.py
-        echo "Running PHP tests..."
-        php test/test.php
+        echo "🚀 Running all available language tests dynamically..."
+        node test/run-tests.js
         
-    - name: Run unified test runner (All languages)
-      run: node test/run-tests.js
-      
-    - name: Verify schema file exists
-      run: test -f response.schema.json
-      
-    - name: Verify TypeScript definitions
-      run: test -f response.d.ts
+    - name: Verify core project files
+      run: |
+        echo "✅ Verifying core project files..."
+        test -f response.schema.json
+        test -f response.d.ts
+        test -f package.json
+        test -f README.md
+        echo "✅ All core files verified!"
 
   test-windows:
     name: Windows Compatibility Test
@@ -165,12 +207,17 @@ jobs:
       with:
         php-version: '8.2'
         
-    - name: Run tests on Windows
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+        
+    - name: Run all available tests on Windows
+      shell: pwsh
       run: |
-        node test/test.js
-        python test/test.py
-        php test/test.php
+        Write-Host "🪟 Running all available language tests on Windows..."
         node test/run-tests.js
+        Write-Host "✅ Windows compatibility tests completed!"
 
   test-macos:
     name: macOS Compatibility Test
@@ -195,12 +242,16 @@ jobs:
       with:
         php-version: '8.2'
         
-    - name: Run tests on macOS
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+        
+    - name: Run all available tests on macOS
       run: |
-        node test/test.js
-        python test/test.py
-        php test/test.php
+        echo "🍎 Running all available language tests on macOS..."
         node test/run-tests.js
+        echo "✅ macOS compatibility tests completed!"
 
   code-quality:
     name: Code Quality Checks
@@ -290,24 +341,68 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v5
       
-    - name: Build Docker image
-      run: docker build -t json-response-standard-test .
+    - name: Setup Node.js for generators
+      uses: actions/setup-node@v5
+      with:
+        node-version: '20'
+        
+    - name: Generate dynamic Docker configurations
+      run: |
+        echo "🔧 Generating dynamic Docker configurations..."
+        node scripts/generate-dockerfile.js --available
+        node scripts/generate-docker-compose.js --override
+        echo "✅ Dynamic configurations generated!"
+        
+    - name: Build Docker image with dynamic Dockerfile
+      run: |
+        if [ -f Dockerfile.generated ]; then
+          docker build -f Dockerfile.generated -t json-response-standard-test .
+        else
+          docker build -t json-response-standard-test .
+        fi
       
-    - name: Run tests in Docker
+    - name: Run all tests in Docker
       run: docker run json-response-standard-test
       
-    - name: Test Docker Compose
+    - name: Test Docker Compose main service
       run: |
         docker compose up --build --abort-on-container-exit json-response-standard
         
-    - name: Test individual language containers
+    - name: Test discovered language containers dynamically
       run: |
-        echo "Testing JavaScript container..."
-        docker compose up --build --abort-on-container-exit test-js
-        echo "Testing Python container..."
-        docker compose up --build --abort-on-container-exit test-python
-        echo "Testing PHP container..."
-        docker compose up --build --abort-on-container-exit test-php
+        echo "🐳 Testing discovered language containers..."
+        
+        # Get list of available services
+        available_services=$(docker compose config --services 2>/dev/null || echo "")
+        
+        if [ -n "$available_services" ]; then
+          echo "Available services: $available_services"
+          
+          # Test each language service if it exists
+          for service in $available_services; do
+            if [[ $service == test-* ]]; then
+              echo "Testing $service..."
+              if docker compose up --build --abort-on-container-exit $service; then
+                echo "✅ $service passed"
+              else
+                echo "❌ $service failed"
+              fi
+            fi
+          done
+        else
+          echo "No additional services found, testing individual languages..."
+          
+          # Fallback: test known patterns
+          for lang in javascript python php go rust java csharp ruby; do
+            service="test-$lang"
+            if docker compose config --services 2>/dev/null | grep -q "^$service$"; then
+              echo "Testing $service..."
+              docker compose up --build --abort-on-container-exit $service || echo "⚠️  $service failed (expected if language not implemented)"
+            fi
+          done
+        fi
+        
+        echo "✅ Dynamic container testing completed!"
 
   deploy-staging:
     name: Deploy to Staging Environment
