@@ -124,9 +124,9 @@ jobs:
       - name: Install dependencies (if any)
         run: |
           if [ -f package-lock.json ]; then
-          npm ci --ignore-scripts
+            npm ci --ignore-scripts
           else
-          echo "No package-lock.json found, skipping npm ci"
+            echo "No package-lock.json found, skipping npm ci"
           fi
         
       - name: Run tests for ${{ matrix.language }}
@@ -184,9 +184,9 @@ jobs:
           test -f README.md
           echo "✅ All core files verified!"
 
-          test-windows:
-          name: Windows Compatibility Test
-          runs-on: windows-latest
+  test-windows:
+    name: Windows Compatibility Test
+    runs-on: windows-latest
     
     steps:
       - name: Checkout code
@@ -195,22 +195,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-        node-version: '20'
+          node-version: '20'
         
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-        python-version: '3.11'
+          python-version: '3.11'
         
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-        php-version: '8.2'
+          php-version: '8.2'
         
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-        go-version: '1.22'
+          go-version: '1.22'
         
       - name: Run all available tests on Windows
         shell: pwsh
@@ -219,9 +219,9 @@ jobs:
           node test/run-tests.js
           Write-Host "✅ Windows compatibility tests completed!"
 
-          test-macos:
-          name: macOS Compatibility Test
-          runs-on: macos-latest
+  test-macos:
+    name: macOS Compatibility Test
+    runs-on: macos-latest
     
     steps:
       - name: Checkout code
@@ -230,22 +230,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-        node-version: '20'
+          node-version: '20'
         
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-        python-version: '3.11'
+          python-version: '3.11'
         
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-        php-version: '8.2'
+          php-version: '8.2'
         
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-        go-version: '1.22'
+          go-version: '1.22'
         
       - name: Run all available tests on macOS
         run: |
@@ -253,9 +253,9 @@ jobs:
           node test/run-tests.js
           echo "✅ macOS compatibility tests completed!"
 
-          code-quality:
-          name: Code Quality Checks
-          runs-on: ubuntu-latest
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
@@ -264,7 +264,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-        node-version: '20'
+          node-version: '20'
         
       - name: Check file structure
         run: |
@@ -304,9 +304,9 @@ jobs:
           echo "Validating package.json..."
           node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
 
-          security-audit:
-          name: Security Audit
-          runs-on: ubuntu-latest
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
@@ -315,7 +315,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-        node-version: '20'
+          node-version: '20'
         
       - name: Run npm audit
         run: npm audit --audit-level=moderate
@@ -333,9 +333,9 @@ jobs:
           echo "✅ No sensitive files found"
           fi
 
-          test-docker:
-          name: Docker Container Test
-          runs-on: ubuntu-latest
+  test-docker:
+    name: Docker Container Test
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout code
@@ -344,7 +344,7 @@ jobs:
       - name: Setup Node.js for generators
         uses: actions/setup-node@v5
         with:
-        node-version: '20'
+          node-version: '20'
         
       - name: Generate dynamic Docker configurations
         run: |
@@ -404,12 +404,12 @@ jobs:
         
           echo "✅ Dynamic container testing completed!"
 
-          deploy-staging:
-          name: Deploy to Staging Environment
-          runs-on: ubuntu-latest
-          needs: [test-all-languages, code-quality, security-audit, test-docker]
-          if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
-          environment: staging
+  deploy-staging:
+    name: Deploy to Staging Environment
+    runs-on: ubuntu-latest
+    needs: [test-all-languages, code-quality, security-audit, test-docker]
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+    environment: staging
     
     steps:
       - name: Checkout code
@@ -418,7 +418,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-        node-version: '20'
+          node-version: '20'
         
       - name: Build for staging
         run: |
