@@ -1,173 +1,118 @@
 <?php
-/**
- * Test suite for PHP JSON Response Standard
- */
+declare(strict_types=1);
 
-// Include the response function
 require_once __DIR__ . '/../examples/response.php';
 
-class JsonResponseTest {
-    protected $passedTests = 0;
-    protected $totalTests = 0;
-    
-    /**
-     * Simple test runner function
-     */
-    public function test($description, $testFunc) {
-        $this->totalTests++;
-        try {
-            $testFunc();
-            echo "[PASS] {$description}\n";
-            $this->passedTests++;
-            return true;
-        } catch (Exception $e) {
-            echo "[FAIL] {$description}: {$e->getMessage()}\n";
-            return false;
-        }
-    }
-    
-    /**
-     * Custom assertion function
-     */
-    protected function assert($condition, $message) {
-        if (!$condition) {
-            throw new Exception($message);
-        }
-    }
-    
-    /**
-     * Run all tests
-     */
-    public function runTests() {
-        // Test 1: Basic response generation
-        $this->test("Basic response generation", function() {
-            ob_start();
-            jsonResponse(['user' => 'John'], 200, 'Success');
-        });
-        
-        // Test 2: Default values
-        $this->test("Default values", function() {
-            ob_start();
-            jsonResponse();
-        });
-        
-        // Test 3: Empty data array
-        $this->test("Empty data array", function() {
-            ob_start();
-            jsonResponse([], 200, 'Empty data');
-        });
-        
-        // Test 4: Complex data structure
-        $this->test("Complex data structure", function() {
-            $complexData = [
-                'users' => [
-                    ['id' => 1, 'name' => 'John'],
-                    ['id' => 2, 'name' => 'Jane']
-                ],
-                'meta' => ['total' => 2, 'page' => 1]
-            ];
-            ob_start();
-            jsonResponse($complexData, 201, 'Created');
-        });
-        
-        // Test 5: Different status codes
-        $this->test("Different status codes", function() {
-            $statusCodes = [200, 201, 400, 404, 500];
-            foreach ($statusCodes as $code) {
-                ob_start();
-                jsonResponse(['test' => true], $code, "Status {$code}");
-                ob_get_clean(); // Clean the buffer
-            }
-        });
-        
-        // Test 6: JSON encoding validation
-        $this->test("JSON encoding validation", function() {
-            ob_start();
-            jsonResponse(['special' => 'characters: áéíóú'], 200, 'UTF-8 test');
-            $output = ob_get_clean();
-            $decoded = json_decode($output, true);
-            $this->assert($decoded !== null, 'Output should be valid JSON');
-            $this->assert($decoded['data']['special'] === 'characters: áéíóú', 'UTF-8 characters should be preserved');
-        });
-        
-        // Test 7: Header validation
-        $this->test("Content-Type header set", function() {
-            // Note: In a real environment, you'd check headers_list()
-            // For this test, we'll just ensure the function runs without error
-            ob_start();
-            jsonResponse(['header' => 'test'], 200, 'Header test');
-            ob_get_clean();
-            // In a full test environment, you would assert:
-            // $this->assert(in_array('Content-Type: application/json', headers_list()), 'Content-Type header should be set');
-        });
-        
-        echo "\nTests completed! {$this->passedTests}/{$this->totalTests} tests passed.\n";
-        return $this->passedTests === $this->totalTests;
+$passedTests = 0;
+$totalTests = 0;
+
+function assertCondition(bool $condition, string $message): void
+{
+    if (!$condition) {
+        throw new Exception($message);
     }
 }
 
-// Helper function to create a testable version of jsonResponse
-function testableJsonResponse($data = [], $status = 200, $message = '') {
-    return json_encode([
-        'status' => $status,
-        'message' => $message,
-        'data' => $data
-    ], JSON_PRETTY_PRINT);
-}
+function test(string $description, callable $fn): void
+{
+    global $passedTests, $totalTests;
 
-// Enhanced test class for more detailed testing
-class DetailedJsonResponseTest extends JsonResponseTest {
-    
-    public function runDetailedTests() {
-        echo "Running detailed PHP JSON Response tests...\n\n";
-        
-        // Test the testable version for detailed validation
-        $this->test("Detailed JSON structure validation", function() {
-            $result = testableJsonResponse(['user' => 'John'], 200, 'Success');
-            $decoded = json_decode($result, true);
-            
-            $this->assert(isset($decoded['status']), 'Response should have status field');
-            $this->assert(isset($decoded['message']), 'Response should have message field');
-            $this->assert(isset($decoded['data']), 'Response should have data field');
-            
-            $this->assert($decoded['status'] === 200, 'Status should be 200');
-            $this->assert($decoded['message'] === 'Success', 'Message should be "Success"');
-            $this->assert($decoded['data']['user'] === 'John', 'Data should contain user');
-        });
-        
-        $this->test("Default values detailed", function() {
-            $result = testableJsonResponse();
-            $decoded = json_decode($result, true);
-            
-            $this->assert($decoded['status'] === 200, 'Default status should be 200');
-            $this->assert($decoded['message'] === '', 'Default message should be empty');
-            $this->assert(is_array($decoded['data']), 'Default data should be array');
-            $this->assert(empty($decoded['data']), 'Default data should be empty array');
-        });
-        
-        $this->test("JSON pretty print format", function() {
-            $result = testableJsonResponse(['test' => true], 200, 'Format test');
-            $this->assert(strpos($result, "\n") !== false, 'Output should be pretty printed');
-            $this->assert(json_decode($result) !== null, 'Output should be valid JSON');
-        });
-        
-        echo "\nDetailed tests completed! {$this->passedTests}/{$this->totalTests} tests passed.\n";
-        
-        if ($this->passedTests === $this->totalTests) {
-            echo "[SUCCESS] All PHP tests passed!\n";
-        } else {
-            $failed = $this->totalTests - $this->passedTests;
-            echo "[WARNING] {$failed} tests failed.\n";
-        }
-        
-        return $this->passedTests === $this->totalTests;
+    $totalTests++;
+
+    try {
+        $fn();
+        echo "[PASS] {$description}\n";
+        $passedTests++;
+    } catch (Throwable $error) {
+        echo "[FAIL] {$description}: {$error->getMessage()}\n";
     }
 }
 
-// Run the tests
-if (basename(__FILE__) == basename($_SERVER["SCRIPT_FILENAME"])) {
-    $tester = new DetailedJsonResponseTest();
-    $success = $tester->runDetailedTests();
-    exit($success ? 0 : 1);
-}
-?>
+test('Basic response generation', function (): void {
+    $result = jsonResponse(['user' => 'John'], 200, 'Success');
+    $decoded = json_decode($result, true);
+
+    assertCondition(is_array($decoded), 'Response should decode to array');
+    assertCondition($decoded['status'] === 200, 'Status should be 200');
+    assertCondition($decoded['message'] === 'Success', 'Message should be "Success"');
+    assertCondition($decoded['data']['user'] === 'John', 'Data should contain user');
+});
+
+test('Default values', function (): void {
+    $result = jsonResponse();
+    $decoded = json_decode($result, true);
+
+    assertCondition(is_array($decoded), 'Response should decode to array');
+    assertCondition($decoded['status'] === 200, 'Default status should be 200');
+    assertCondition($decoded['message'] === '', 'Default message should be empty string');
+    assertCondition(is_array($decoded['data']), 'Default data should be array');
+    assertCondition($decoded['data'] === [], 'Default data should be empty array');
+});
+
+test('Status validation - invalid type', function (): void {
+    try {
+        jsonResponse([], 'invalid', 'test');
+        throw new Exception('Expected InvalidArgumentException');
+    } catch (InvalidArgumentException $error) {
+        assertCondition(strpos($error->getMessage(), 'Status must be a valid HTTP status code') !== false, 'Wrong error message for invalid status type');
+    }
+});
+
+test('Status validation - out of range', function (): void {
+    try {
+        jsonResponse([], 99, 'test');
+        throw new Exception('Expected InvalidArgumentException');
+    } catch (InvalidArgumentException $error) {
+        assertCondition(strpos($error->getMessage(), 'Status must be a valid HTTP status code') !== false, 'Wrong error message for out of range status');
+    }
+});
+
+test('Message validation - invalid type', function (): void {
+    try {
+        jsonResponse([], 200, 123);
+        throw new Exception('Expected InvalidArgumentException');
+    } catch (InvalidArgumentException $error) {
+        assertCondition(strpos($error->getMessage(), 'Message must be a string') !== false, 'Wrong error message for invalid message type');
+    }
+});
+
+test('Data validation - invalid type', function (): void {
+    try {
+        jsonResponse('invalid', 200, 'test');
+        throw new Exception('Expected InvalidArgumentException');
+    } catch (InvalidArgumentException $error) {
+        assertCondition(strpos($error->getMessage(), 'Data must be an array or null') !== false, 'Wrong error message for invalid data type');
+    }
+});
+
+test('Null data defaults to empty array', function (): void {
+    $result = jsonResponse(null, 200, 'Success');
+    $decoded = json_decode($result, true);
+
+    assertCondition($decoded['data'] === [], 'Null data should default to empty array');
+});
+
+test('Complex data structure', function (): void {
+    $complexData = [
+        'users' => [
+            ['id' => 1, 'name' => 'John'],
+            ['id' => 2, 'name' => 'Jane'],
+        ],
+        'meta' => ['total' => 2, 'page' => 1],
+    ];
+
+    $result = jsonResponse($complexData, 201, 'Created');
+    $decoded = json_decode($result, true);
+
+    assertCondition($decoded['status'] === 201, 'Status should be 201');
+    assertCondition($decoded['data']['users'][0]['name'] === 'John', 'Complex data should be preserved');
+});
+
+test('Pretty printed JSON output', function (): void {
+    $result = jsonResponse(['test' => true], 200, 'Format test');
+    assertCondition(strpos($result, "\n") !== false, 'Output should be pretty printed');
+});
+
+echo "\nTests completed! {$passedTests}/{$totalTests} tests passed.\n";
+
+exit($passedTests === $totalTests ? 0 : 1);
