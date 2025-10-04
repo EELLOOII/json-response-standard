@@ -38,11 +38,19 @@ RUN apt-get update && apt-get install -y \
     php-mbstring \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Go
+ENV GO_VERSION=1.23.1
+RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz \
+    && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz \
+    && rm go${GO_VERSION}.linux-amd64.tar.gz
+ENV PATH="/usr/local/go/bin:${PATH}"
+
 # Verify installations
 RUN node --version && \
     npm --version && \
     python --version && \
-    php --version
+    php --version && \
+    go version
 
 # Set working directory
 WORKDIR /app
@@ -55,6 +63,9 @@ RUN if [ -f package-lock.json ]; then npm ci --only=production; fi
 
 # Copy project files
 COPY . .
+
+# Initialize Go module (as root before switching user)
+RUN go mod download || echo "No external Go dependencies"
 
 # Create non-root user for security
 RUN useradd -m -u 1000 jsonuser && chown -R jsonuser:jsonuser /app
