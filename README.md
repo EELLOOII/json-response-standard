@@ -1,6 +1,6 @@
 # JSON Response Standard
 
-A simple, consistent JSON response format that works across **PHP, Python, JavaScript**, and other languages.
+A simple, consistent JSON response format that works across **PHP, Python, JavaScript, and Go**.
 
 ---
 
@@ -35,12 +35,23 @@ require_once './examples/response.php';
 jsonResponse(['user' => 'John'], 200, 'Success');
 ```
 
+### Go
+```go
+import "github.com/EELLOOII/json-response-standard/go-lib/examples"
+
+result, err := examples.JsonResponse(map[string]interface{}{"user": "John"}, 200, "Success")
+if err != nil {
+    // handle error
+}
+fmt.Println(result)
+```
+
 ## 📋 Schema Validation
 
 This project includes a JSON schema file ([response.schema.json](response.schema.json)) that defines the standard response format. All responses must include:
 
 - `status` (integer): HTTP-like status code
-- `message` (string): Human-readable status message  
+- `message` (string): Human-readable status message
 - `data` (object): Response payload
 
 ## 🔧 Installation
@@ -71,11 +82,13 @@ json-response-standard/
 ├── examples/           # Implementation files
 │   ├── response.js     # JavaScript implementation
 │   ├── response.py     # Python implementation
-│   └── response.php    # PHP implementation
+│   ├── response.php    # PHP implementation
+│   └── response.go     # Go implementation
 ├── test/              # Test files
 │   ├── test.js        # JavaScript tests
 │   ├── test.py        # Python tests
 │   ├── test.php       # PHP tests
+│   ├── test.go        # Go tests
 │   └── run-tests.js   # Unified test runner
 ├── .github/           # CI/CD workflows
 │   └── workflows/     # GitHub Actions
@@ -100,7 +113,7 @@ json-response-standard/
 
 ## 🧪 Testing
 
-This project includes comprehensive tests to ensure all implementations work correctly across **JavaScript, Python, and PHP**.
+This project includes comprehensive tests to ensure all implementations work correctly across **JavaScript, Python, PHP, and Go**.
 
 ### 🚀 Unified Test Runner (Recommended)
 
@@ -113,8 +126,9 @@ npm test
 
 # Test specific languages
 npm run test:js      # JavaScript only
-npm run test:python  # Python only  
+npm run test:python  # Python only
 npm run test:php     # PHP only
+npm run test:go      # Go only
 npm run test:all     # All languages
 ```
 
@@ -127,6 +141,7 @@ node test/run-tests.js
 node test/run-tests.js js        # JavaScript only
 node test/run-tests.js python    # Python only
 node test/run-tests.js php       # PHP only
+node test/run-tests.js go        # Go only
 
 # Get help
 node test/run-tests.js --help
@@ -140,11 +155,14 @@ You can also run tests for each language individually:
 # JavaScript tests
 node test/test.js
 
-# Python tests  
+# Python tests
 python test/test.py
 
 # PHP tests
 php test/test.php
+
+# Go tests
+go run test/test.go
 ```
 
 **Note for Windows PowerShell users:** If you encounter execution policy errors with npm, use the direct Node.js commands or run:
@@ -210,7 +228,7 @@ The comprehensive test suite validates:
 
 #### JavaScript Tests (5 tests)
 - ✅ **Basic response generation** - Creates proper JSON with correct structure
-- ✅ **Default values** - Handles missing parameters correctly  
+- ✅ **Default values** - Handles missing parameters correctly
 - ✅ **Status validation** - Catches invalid status codes and types
 - ✅ **Message validation** - Ensures message is always a string
 - ✅ **Error handling** - Robust validation and error messages
@@ -228,6 +246,16 @@ The comprehensive test suite validates:
 - ✅ **JSON structure validation** - Complete response format
 - ✅ **Default values** - Parameter defaults
 - ✅ **JSON encoding** - Pretty print and UTF-8 support
+
+#### Go Tests (8 tests)
+- ✅ **Basic response generation** - JSON structure validation with proper indentation
+- ✅ **Default values** - Parameter handling and nil data support
+- ✅ **Status validation** - HTTP status code range enforcement (100-599)
+- ✅ **Nil data handling** - Proper null value serialization
+- ✅ **Complex data structures** - Nested maps and arrays
+- ✅ **Empty object data** - Empty map handling
+- ✅ **Error handling** - Comprehensive validation and error messages
+- ✅ **Status code boundaries** - Valid HTTP status code range testing
 
 ### 📊 Expected Output
 
@@ -265,14 +293,28 @@ Tests completed! 7/7 tests passed.
 
 Detailed tests completed! 3/3 tests passed.
 
+🟡 Running Go tests...
+✅ Basic response generation
+✅ Default values
+✅ Status validation - out of range (low)
+✅ Status validation - out of range (high)
+✅ Nil data handling
+✅ Complex data structure
+✅ Empty object data
+✅ Valid status code boundaries
+
+Tests completed! 8/8 tests passed.
+[SUCCESS] All Go tests passed!
+
 ==================================================
 📊 TEST SUMMARY
 ==================================================
 ✅ Javascript: PASSED
 ✅ Python: PASSED
 ✅ Php: PASSED
+✅ Go: PASSED
 ==================================================
-🎯 Overall: 3/3 language tests passed
+🎯 Overall: 4/4 language tests passed
 🎉 All tests passed! Your JSON Response Standard is working perfectly across all languages!
 ```
 
@@ -282,11 +324,12 @@ Detailed tests completed! 3/3 tests passed.
 
 To contribute to this project or run all tests, install these dependencies:
 
-| Language | Minimum Version | Download Link | Verify Command |
-|----------|----------------|---------------|----------------|
-| **Node.js** | 12+ | [nodejs.org](https://nodejs.org/) | `node --version` |
-| **Python** | 3.5+ | [python.org](https://www.python.org/downloads/) | `python --version` |
-| **PHP** | 5.4+ | [php.net](https://www.php.net/downloads) | `php --version` |
+| Language    | Minimum Version | Download Link                                   | Verify Command     |
+| ----------- | --------------- | ----------------------------------------------- | ------------------ |
+| **Node.js** | 12+             | [nodejs.org](https://nodejs.org/)               | `node --version`   |
+| **Python**  | 3.5+            | [python.org](https://www.python.org/downloads/) | `python --version` |
+| **PHP**     | 5.4+            | [php.net](https://www.php.net/downloads)        | `php --version`    |
+| **Go**      | 1.21+           | [go.dev](https://go.dev/dl/)                    | `go version`       |
 
 ### For End Users (Implementation Only)
 
@@ -296,13 +339,17 @@ Each implementation has **zero external dependencies**:
 - Node.js (any recent version)
 - No external packages required
 
-#### Python  
+#### Python
 - Python 3.5+ (for typing support)
 - Uses only standard library (`json`, `typing`)
 
 #### PHP
 - PHP 5.4+ (for modern array syntax)
 - No external packages required
+
+#### Go
+- Go 1.21+ (for standard library support)
+- Uses only standard library (`encoding/json`, `fmt`)
 
 ### 💡 Partial Testing
 You can test individual languages even if you don't have all dependencies installed. The unified test runner automatically detects available languages and skips missing ones.
@@ -331,7 +378,7 @@ docker-compose up json-response-standard
 
 # Run specific language tests
 docker-compose up test-js      # JavaScript only
-docker-compose up test-python  # Python only  
+docker-compose up test-python  # Python only
 docker-compose up test-php     # PHP only
 
 # Interactive development
@@ -359,7 +406,7 @@ docker run -it json-response-standard /bin/bash
 The Docker container includes:
 - **Ubuntu 22.04** base image
 - **Node.js 20** for JavaScript testing
-- **Python 3.11** for Python testing  
+- **Python 3.11** for Python testing
 - **PHP 8.2** for PHP testing
 - **Non-root user** for security
 - **Health checks** for monitoring
@@ -467,7 +514,7 @@ We're looking for:
 Example commit messages:
 ```
 feat: add Go implementation with validation
-test: add edge case tests for Python implementation  
+test: add edge case tests for Python implementation
 docs: update README with Rust example
 fix: handle Unicode characters in PHP implementation
 ```
@@ -482,7 +529,7 @@ fix: handle Unicode characters in PHP implementation
    ```
 
 2. **Install dependencies** (for testing):
-   - Node.js 12+ 
+   - Node.js 12+
    - Python 3.5+
    - PHP 5.4+
 
@@ -590,7 +637,7 @@ npm run test:ci
 
 # Run individual language tests
 npm run test:js
-npm run test:python  
+npm run test:python
 npm run test:php
 
 # Check for issues before committing
