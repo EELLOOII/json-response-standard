@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
  * Unified Test Runner for JSON Response Standard
- * 
+ *
  * SUPPORTED LANGUAGES: JavaScript, Python, PHP, Go, Rust, Java, C#, Ruby
  * NOTE: Additional languages are automatically detected if test files exist.
  * Languages without test files will be gracefully skipped.
- * 
+ *
  * Usage: node test/run-tests.js [language]
- * 
+ *
  * Examples:
  *   node test/run-tests.js           // Run all tests
  *   node test/run-tests.js js        // Run only JavaScript tests
@@ -26,7 +26,7 @@ class TestRunner {
         this.testDir = __dirname;
         this.projectRoot = path.dirname(this.testDir);
         this.results = {};
-        
+
         // Language configurations - easily extensible by contributors
         this.languageConfigs = {
             'javascript': {
@@ -52,6 +52,15 @@ class TestRunner {
                 args: ['test/test.php'],
                 versionFlag: '--version',
                 displayName: 'PHP'
+            },
+            'typescript': {
+                aliases: ['ts', 'typescript'],
+                testFile: 'test.ts',
+                command: 'npx',
+                args: ['ts-node', '--transpile-only', 'test/test.ts'],
+                versionFlag: '--version',
+                displayName: 'TypeScript',
+                skipIfMissing: true // Skip if ts-node not available
             },
             // Additional languages (will be auto-discovered if test files exist)
             'go': {
@@ -139,7 +148,7 @@ class TestRunner {
      */
     discoverAvailableLanguages() {
         const availableLanguages = [];
-        
+
         for (const [langKey, config] of Object.entries(this.languageConfigs)) {
             const testFilePath = path.join(this.testDir, config.testFile);
             if (fs.existsSync(testFilePath)) {
@@ -150,7 +159,7 @@ class TestRunner {
                 });
             }
         }
-        
+
         return availableLanguages;
     }
 
@@ -159,13 +168,13 @@ class TestRunner {
      */
     getLanguageByAlias(alias) {
         const normalizedAlias = alias.toLowerCase();
-        
+
         for (const [langKey, config] of Object.entries(this.languageConfigs)) {
             if (config.aliases.includes(normalizedAlias)) {
                 return { key: langKey, config: config };
             }
         }
-        
+
         return null;
     }
 
@@ -186,14 +195,14 @@ class TestRunner {
      */
     async runLanguageTests(languageKey, config) {
         console.log(`[INFO] Running ${config.displayName} tests...`);
-        
+
         // Check if test file exists
         const testFilePath = path.join(this.testDir, config.testFile);
         if (!fs.existsSync(testFilePath)) {
             console.log(`[SKIP] ${config.displayName} test file (${config.testFile}) not found.`);
             return null; // null indicates test file doesn't exist
         }
-        
+
         // Check if command is available
         const commandAvailable = await this.checkCommand(config.command, config.versionFlag);
         if (!commandAvailable) {
@@ -205,13 +214,13 @@ class TestRunner {
             const result = await this.runCommand(config.command, config.args);
             console.log(result.stdout);
             if (result.stderr) console.log('Error:', result.stderr);
-            
+
             this.results[languageKey] = {
                 success: result.success,
                 output: result.stdout,
                 displayName: config.displayName
             };
-            
+
             return result.success;
         } catch (error) {
             console.log(`[ERROR] ${config.displayName} tests failed:`, error.message);
@@ -226,22 +235,22 @@ class TestRunner {
         console.log('\n' + '='.repeat(50));
         console.log('📊 TEST SUMMARY');
         console.log('='.repeat(50));
-        
+
         let totalPassed = 0;
         let totalRun = 0;
-        
+
         Object.entries(this.results).forEach(([language, result]) => {
             const status = result.success ? '[PASS]' : '[FAIL]';
             const languageName = result.displayName || language.charAt(0).toUpperCase() + language.slice(1);
             console.log(`${status} ${languageName}: ${result.success ? 'PASSED' : 'FAILED'}`);
-            
+
             if (result.success) totalPassed++;
             totalRun++;
         });
-        
+
         console.log('='.repeat(50));
         console.log('[SUMMARY] Overall: ' + totalPassed + '/' + totalRun + ' language tests passed');
-        
+
         if (totalPassed === totalRun && totalRun > 0) {
             console.log('[SUCCESS] All tests passed! Your JSON Response Standard is working perfectly across all languages!');
         } else if (totalPassed === 0) {
@@ -260,13 +269,13 @@ class TestRunner {
 
         if (targetLanguage) {
             console.log(`[INFO] Running tests for: ${targetLanguage}\n`);
-            
+
             // Find language by alias
             const langInfo = this.getLanguageByAlias(targetLanguage);
-            
+
             if (!langInfo) {
                 console.log(`[ERROR] Unknown language: ${targetLanguage}`);
-                
+
                 // Show available languages dynamically
                 const availableLanguages = this.discoverAvailableLanguages();
                 if (availableLanguages.length > 0) {
@@ -277,55 +286,55 @@ class TestRunner {
                 } else {
                     console.log('No test files found. Please add test files for supported languages.');
                 }
-                
+
                 console.log('\nTo add a new language:');
                 console.log('1. Create a test file (e.g., test/test.go)');
                 console.log('2. Add language configuration to test/run-tests.js');
                 console.log('3. Ensure the language runtime is installed');
                 process.exit(1);
             }
-            
+
             const success = await this.runLanguageTests(langInfo.key, langInfo.config);
             process.exit(success ? 0 : 1);
         } else {
             console.log('[INFO] Running tests for all available languages\n');
-            
+
             // Discover and run all available language tests
             const availableLanguages = this.discoverAvailableLanguages();
-            
+
             if (availableLanguages.length === 0) {
                 console.log('[ERROR] No test files found in test/ directory.');
                 console.log('Please ensure test files exist (test.js, test.py, test.php, etc.)');
                 process.exit(1);
             }
-            
+
             console.log(`[INFO] Discovered ${availableLanguages.length} language(s): ${availableLanguages.map(l => l.config.displayName).join(', ')}\n`);
-            
+
             const results = [];
-            
+
             // Run tests for each discovered language
             for (let i = 0; i < availableLanguages.length; i++) {
                 const lang = availableLanguages[i];
                 const result = await this.runLanguageTests(lang.key, lang.config);
                 results.push(result);
-                
+
                 // Add spacing between language tests (except after the last one)
                 if (i < availableLanguages.length - 1) {
                     console.log('');
                 }
             }
-            
+
             this.printSummary();
-            
+
             // Only consider languages that were actually attempted (not null)
             const attemptedResults = results.filter(result => result !== null);
             const allPassed = attemptedResults.length > 0 && attemptedResults.every(result => result === true);
-            
+
             if (attemptedResults.length === 0) {
                 console.log('[ERROR] No languages available for testing. Please install required runtimes.');
                 process.exit(1);
             }
-            
+
             process.exit(allPassed ? 0 : 1);
         }
     }
@@ -339,7 +348,7 @@ const targetLanguage = args[0];
 if (args.includes('--help') || args.includes('-h')) {
     const runner = new TestRunner();
     const availableLanguages = runner.discoverAvailableLanguages();
-    
+
     console.log(`
 Usage: node test/run-tests.js [language]
 

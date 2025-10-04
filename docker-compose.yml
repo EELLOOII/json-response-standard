@@ -64,6 +64,19 @@ services:
     networks:
       - json-network
 
+  # TypeScript only testing
+  test-typescript:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: json-test-typescript
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: npx ts-node test/test.ts
+    networks:
+      - json-network
+
   # PHP only testing
   test-php:
     build:

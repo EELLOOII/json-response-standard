@@ -1,6 +1,6 @@
 # JSON Response Standard
 
-A simple, consistent JSON response format that works across **PHP, Python, JavaScript**, and other languages.
+A simple, consistent JSON response format that works across **JavaScript, TypeScript, Python, PHP**, and other languages.
 
 ---
 
@@ -29,6 +29,18 @@ from examples.response import json_response
 print(json_response({"user": "John"}, 200, "Success"))
 ```
 
+### TypeScript
+```typescript
+import { jsonResponse, JsonResponseData, JsonResponseFormat } from './examples/response';
+
+// Basic usage
+console.log(jsonResponse({ user: "John" }, 200, "Success"));
+
+// With type safety
+const data: JsonResponseData = { user: "John", age: 30 };
+const response: string = jsonResponse(data, 200, "User retrieved successfully");
+```
+
 ### PHP
 ```php
 require_once './examples/response.php';
@@ -40,7 +52,7 @@ jsonResponse(['user' => 'John'], 200, 'Success');
 This project includes a JSON schema file ([response.schema.json](response.schema.json)) that defines the standard response format. All responses must include:
 
 - `status` (integer): HTTP-like status code
-- `message` (string): Human-readable status message  
+- `message` (string): Human-readable status message
 - `data` (object): Response payload
 
 ## 🔧 Installation
@@ -71,7 +83,8 @@ json-response-standard/
 ├── examples/           # Implementation files
 │   ├── response.js     # JavaScript implementation
 │   ├── response.py     # Python implementation
-│   └── response.php    # PHP implementation
+│   ├── response.php    # PHP implementation
+│   └── response.ts     # TypeScript implementation
 ├── test/              # Test files
 │   ├── test.js        # JavaScript tests
 │   ├── test.py        # Python tests
@@ -100,7 +113,7 @@ json-response-standard/
 
 ## 🧪 Testing
 
-This project includes comprehensive tests to ensure all implementations work correctly across **JavaScript, Python, and PHP**.
+This project includes comprehensive tests to ensure all implementations work correctly across **JavaScript, TypeScript, Python, and PHP**.
 
 ### 🚀 Unified Test Runner (Recommended)
 
@@ -112,10 +125,11 @@ Run tests for all languages or specific ones using our intelligent test runner:
 npm test
 
 # Test specific languages
-npm run test:js      # JavaScript only
-npm run test:python  # Python only  
-npm run test:php     # PHP only
-npm run test:all     # All languages
+npm run test:js         # JavaScript only
+npm run test:typescript # TypeScript only
+npm run test:python     # Python only
+npm run test:php        # PHP only
+npm run test:all        # All languages
 ```
 
 #### Direct execution:
@@ -124,9 +138,10 @@ npm run test:all     # All languages
 node test/run-tests.js
 
 # Test specific languages
-node test/run-tests.js js        # JavaScript only
-node test/run-tests.js python    # Python only
-node test/run-tests.js php       # PHP only
+node test/run-tests.js js         # JavaScript only
+node test/run-tests.js typescript # TypeScript only
+node test/run-tests.js python     # Python only
+node test/run-tests.js php        # PHP only
 
 # Get help
 node test/run-tests.js --help
@@ -140,7 +155,7 @@ You can also run tests for each language individually:
 # JavaScript tests
 node test/test.js
 
-# Python tests  
+# Python tests
 python test/test.py
 
 # PHP tests
@@ -156,10 +171,11 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 To run all tests, you need the following installed on your machine:
 
-#### Node.js (Required for JavaScript tests and test runner)
+#### Node.js (Required for JavaScript/TypeScript tests and test runner)
 - **Download:** [nodejs.org](https://nodejs.org/)
 - **Minimum version:** Node.js 12+ (any recent version)
 - **Verify installation:** `node --version`
+- **Note:** TypeScript tests use ts-node (installed automatically via npx)
 
 #### Python (Required for Python tests)
 - **Download:** [python.org](https://www.python.org/downloads/)
@@ -210,10 +226,17 @@ The comprehensive test suite validates:
 
 #### JavaScript Tests (5 tests)
 - ✅ **Basic response generation** - Creates proper JSON with correct structure
-- ✅ **Default values** - Handles missing parameters correctly  
+- ✅ **Default values** - Handles missing parameters correctly
 - ✅ **Status validation** - Catches invalid status codes and types
 - ✅ **Message validation** - Ensures message is always a string
 - ✅ **Error handling** - Robust validation and error messages
+
+#### TypeScript Tests (5 tests)
+- ✅ **Basic response generation** - Type-safe JSON creation
+- ✅ **Default values** - Parameter defaults with type checking
+- ✅ **Status validation** - Type and range validation
+- ✅ **Message validation** - String type enforcement
+- ✅ **Interface compliance** - JsonResponseFormat type safety
 
 #### Python Tests (7 tests)
 - ✅ **Basic response generation** - JSON structure validation
@@ -224,7 +247,7 @@ The comprehensive test suite validates:
 - ✅ **Complex data structures** - Nested objects and arrays
 - ✅ **Type hints validation** - Python-specific type checking
 
-#### PHP Tests (3 detailed tests)
+#### PHP Tests (9 tests)
 - ✅ **JSON structure validation** - Complete response format
 - ✅ **Default values** - Parameter defaults
 - ✅ **JSON encoding** - Pretty print and UTF-8 support
@@ -282,11 +305,11 @@ Detailed tests completed! 3/3 tests passed.
 
 To contribute to this project or run all tests, install these dependencies:
 
-| Language | Minimum Version | Download Link | Verify Command |
-|----------|----------------|---------------|----------------|
-| **Node.js** | 12+ | [nodejs.org](https://nodejs.org/) | `node --version` |
-| **Python** | 3.5+ | [python.org](https://www.python.org/downloads/) | `python --version` |
-| **PHP** | 5.4+ | [php.net](https://www.php.net/downloads) | `php --version` |
+| Language    | Minimum Version | Download Link                                   | Verify Command     |
+| ----------- | --------------- | ----------------------------------------------- | ------------------ |
+| **Node.js** | 12+             | [nodejs.org](https://nodejs.org/)               | `node --version`   |
+| **Python**  | 3.5+            | [python.org](https://www.python.org/downloads/) | `python --version` |
+| **PHP**     | 5.4+            | [php.net](https://www.php.net/downloads)        | `php --version`    |
 
 ### For End Users (Implementation Only)
 
@@ -296,7 +319,12 @@ Each implementation has **zero external dependencies**:
 - Node.js (any recent version)
 - No external packages required
 
-#### Python  
+#### TypeScript
+- Node.js (any recent version)
+- TypeScript compiler or ts-node for execution
+- Uses only standard library types
+
+#### Python
 - Python 3.5+ (for typing support)
 - Uses only standard library (`json`, `typing`)
 
@@ -330,9 +358,10 @@ For contributors and cross-platform testing, Docker provides a consistent enviro
 docker-compose up json-response-standard
 
 # Run specific language tests
-docker-compose up test-js      # JavaScript only
-docker-compose up test-python  # Python only  
-docker-compose up test-php     # PHP only
+docker-compose up test-js         # JavaScript only
+docker-compose up test-typescript # TypeScript only
+docker-compose up test-python     # Python only
+docker-compose up test-php        # PHP only
 
 # Interactive development
 docker-compose up json-dev
@@ -359,7 +388,7 @@ docker run -it json-response-standard /bin/bash
 The Docker container includes:
 - **Ubuntu 22.04** base image
 - **Node.js 20** for JavaScript testing
-- **Python 3.11** for Python testing  
+- **Python 3.11** for Python testing
 - **PHP 8.2** for PHP testing
 - **Non-root user** for security
 - **Health checks** for monitoring
@@ -467,7 +496,7 @@ We're looking for:
 Example commit messages:
 ```
 feat: add Go implementation with validation
-test: add edge case tests for Python implementation  
+test: add edge case tests for Python implementation
 docs: update README with Rust example
 fix: handle Unicode characters in PHP implementation
 ```
@@ -482,7 +511,7 @@ fix: handle Unicode characters in PHP implementation
    ```
 
 2. **Install dependencies** (for testing):
-   - Node.js 12+ 
+   - Node.js 12+
    - Python 3.5+
    - PHP 5.4+
 
@@ -535,6 +564,7 @@ Every push and pull request triggers automated testing across:
 
 #### Multi-Language Testing
 - **JavaScript**: Node.js 16, 18, 20, 22
+- **TypeScript**: Node.js 16, 18, 20, 22 (with ts-node)
 - **Python**: 3.8, 3.9, 3.10, 3.11, 3.12
 - **PHP**: 7.4, 8.0, 8.1, 8.2, 8.3
 
@@ -590,7 +620,8 @@ npm run test:ci
 
 # Run individual language tests
 npm run test:js
-npm run test:python  
+npm run test:typescript
+npm run test:python
 npm run test:php
 
 # Check for issues before committing
