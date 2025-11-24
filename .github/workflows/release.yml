@@ -14,7 +14,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Verify staging branch integration
       run: |
@@ -64,7 +64,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -121,7 +121,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -147,7 +147,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Generate changelog
       run: |

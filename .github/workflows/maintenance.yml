@@ -13,7 +13,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -41,7 +41,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Setup latest Node.js
       uses: actions/setup-node@v5
@@ -73,7 +73,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -92,7 +92,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Check JavaScript formatting
       run: |
@@ -120,7 +120,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       
     - name: Setup Node.js
       uses: actions/setup-node@v5
