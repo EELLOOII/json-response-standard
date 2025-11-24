@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v5
@@ -47,7 +47,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
@@ -74,7 +74,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup PHP ${{ matrix.php-version }}
       uses: shivammathur/setup-php@v2
@@ -101,7 +101,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Go ${{ matrix.go-version }}
       uses: actions/setup-go@v5
@@ -126,7 +126,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -182,7 +182,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -218,7 +218,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -254,7 +254,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -305,7 +305,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
       uses: actions/setup-node@v5
@@ -334,7 +334,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Build Docker image
       run: docker build -t json-response-standard-test .
@@ -365,7 +365,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
       uses: actions/setup-node@v5
